@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: iotagent-ul
+  labels: 
+    app: idas
+    tier: iotagent-ul
+spec:
+  type: LoadBalancer
+  ports:
+  - name: device
+    port: 7896
+    targetPort: 7896
+  - name: admin
+    port: 4041
+    targetPort: 4041
+  selector:
+    app: idas
+    tier: iotagent-ul
+  
+---
+
+ apiVersion: apps/v1
+ kind: Deployment
+ metadata:
+   name: iotagent-ul
+   labels:
+     app: idas
+     tier: iotagent-ul
+ spec:
+   replicas: 2
+   selector:
+    matchLabels:
+      app: idas
+      tier: iotagent-ul
+   template:
+     metadata:
+       labels:
+         app: idas
+         tier: iotagent-ul
+     spec:
+       containers:
+       - name: idas
+         image: fiware/iotagent-ul
+         ports:
+         - containerPort: 7896
+         - containerPort: 4041
+         env:
+         - name: IOTA_CB_HOST
+           value: orion
+         - name: IOTA_CB_PORT
+           value: "1026"
+         - name: IOTA_NORTH_PORT
+           value: "4041"
+         - name: IOTA_REGISTRY_TYPE
+           value: mongodb
+         - name: IOTA_LOG_LEVEL
+           value: DEBUG
+         - name: IOTA_TIMESTAMP
+           value: "true"
+         - name: IOTA_MONGO_HOST
+           value: mongodb-replicaset
+         - name: IOTA_MONGO_PORT
+           value: "27017"
+         - name: IOTA_MONGO_DB
+           value: iotaul
+         - name: IOTA_HTTP_PORT
+           value: "7896"
+         - name: IOTA_PROVIDER_URL
+           value: http://iotagent-ul:4041
+         - name: ADMIN_USER
+           value: root
+         - name: ADMIN_PASSWORD
+           value: mongodb
+

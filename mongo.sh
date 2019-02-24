@@ -1,0 +1,3 @@
+mongo --eval 'rs.initiate({_id: "MainRepSet", version: 1, members: [{ _id: 0, host : "mongod-0.mongodb-service.kubetest.svc.cluster.local:27017" },{ _id: 1, host : "mongod-1.mongodb-service.kubetest.svc.cluster.local:27017" },{ _id: 2, host : "mongod-2.mongodb-service.kubetest.svc.cluster.local:27017" }]});sleep(3000)'
+mongo --eval 'rs.status();'
+mongo --eval 'db.getSiblingDB("admin").createUser({user:"'"${MONGO_INITDB_ROOT_USERNAME}"'",pwd:"'"${MONGO_INITDB_ROOT_PASSWORD}"'",roles:[{role:"root",db:"admin"}]});'

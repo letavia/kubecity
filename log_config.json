@@ -1,0 +1,20 @@
+{
+  "appenders": [
+    { 
+      "type": "console",
+      "layout": {
+        "type": "pattern",
+        "pattern": "%d  - %p: %c - %m",
+        "replaceConsole": true
+      } 
+    }
+  ],
+  "levels": {
+  	"Server": "DEBUG",
+    "Root": "DEBUG",
+    "HTTP-Client": "DEBUG",
+    "AZF-Client": "DEBUG",
+    "IDM-Client": "DEBUG",
+    "Test": "DEBUG"
+  }
+}

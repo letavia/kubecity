@@ -1,0 +1,114 @@
+mongodb:
+    image: fiware/tutorials.tourguide-app.restaurant-data:20161011
+    hostname: mongodb
+    container_name: mongodb
+    expose:
+        - "27017"
+    command: --smallfiles
+
+orion:
+    image: fiware/orion:latest
+    hostname: orion
+    container_name: orion
+    links:
+        - mongodb
+    expose:
+        - "1026"
+    ports:
+        - "1026:1026"
+    command: -dbhost mongodb
+
+authzforce:
+    image: fiware/authzforce-ce-server:release-5.4.0b
+    hostname: authzforce
+    container_name: authzforce
+    expose:
+        - "8080"
+
+keyrock:
+    image: fiware/idm:v5.3.0
+    hostname: keyrock
+    container_name: keyrock
+    links:
+        - authzforce
+    expose:
+        - "5000"
+        - "8000"
+    ports:
+        - "5000:5000"
+        - "8000:8000"
+
+idas:
+    image: fiware/iotagent-ul:develop
+    hostname: idas
+    container_name: idas
+    links:
+        - mongodb:mongo
+        - orion
+    expose:
+        - "7896"
+        - "4041"
+    ports:
+        - "7896:7896"
+        - "4041:4041"
+
+ul20client:
+    image: bitergia/ul20-client:latest
+    hostname: ul20client
+    container_name: ul20client
+    links:
+        - orion
+        - idas
+    command: --fake --min 0 --max 100 --variance 5
+    environment:
+        - UL20_IOTA_HOST=idas
+        - UL20_IOTA_PORT=7896
+        - UL20_IOTA_ADMIN_PORT=4041
+        - UL20_API_KEY=tourguide-devices
+        - UL20_SERVICE_NAME=tourguide
+
+mysql:
+    image: mysql:5.5
+    hostname: mysql
+    container_name: mysql
+    expose:
+        - "3306"
+    environment:
+        - MYSQL_ROOT_PASSWORD=mysql
+
+cygnus:
+    image: fiware/cygnus-ngsi:develop
+    hostname: cygnus
+    container_name: cygnus
+    links:
+        - orion
+        - mysql:iot-mysql
+    expose:
+        - "5050"
+    environment:
+        - CYGNUS_MYSQL_USER=root
+        - CYGNUS_MYSQL_PASS=mysql
+
+tourguide:
+    image: fiware/tutorials.tourguide-app:latest
+    hostname: tourguide
+    container_name: tourguide
+    links:
+        - orion
+        - keyrock
+        - idas
+        - cygnus
+    environment:
+        - ORION_HOSTNAME=orion
+        - ORION_NO_PROXY_HOSTNAME=orion
+        - ORION_PORT=1026
+        - ORION_PEP_ENABLED=false
+        - IDAS_PORT=7896
+        - IDAS_ADMIN_PORT=4041
+        - IDAS_FIWARE_SERVICE=tourguide
+        - IDAS_FIWARE_SERVICE_PATH=/
+        - IDAS_API_KEY=tourguide-devices
+        - IDM_HOSTNAME=keyrock
+        - IDM_PORT=8000
+    volumes_from:
+        - keyrock

@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    pv.kubernetes.io/bind-completed: "yes"
+    pv.kubernetes.io/bound-by-controller: "yes"
+    volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/glusterfs
+  creationTimestamp: null
+  finalizers:
+  - kubernetes.io/pvc-protection
+  labels:
+    app: orion
+    tier: mongodb
+  name: mongodb-persistent-storage-mongodb-0
+  selfLink: /api/v1/namespaces/default/persistentvolumeclaims/mongodb-persistent-storage-mongodb-0
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: glusterfs-sc
+  volumeName: pvc-06b8bb34-8812-11e8-8978-42010a8000fc
+status: {}

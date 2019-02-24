@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "orion.fullname" . }} #orion
+  labels:
+    app: {{ include "orion.name" . }} #orion
+    chart: {{ include "orion.chart" . }} #orion-0.2.0 
+    release: {{ .Release.Name }} #orion
+    heritage: {{ .Release.Service }} #Tiller
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "orion.name" . }}
+      release: {{ .Release.Name }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 6 }}
+{{- end }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "orion.name" . }} 
+        release: {{ .Release.Name }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 8 }}
+{{- end }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: {{ .Values.container.name }}
+              containerPort: {{ .Values.container.port }}
+              protocol: TCP
+          args:                 
+            - -dbhost
+            - {{ .Values.dbHost }}
+            - -dbuser
+            - {{ .Values.dbUser }}
+            - -dbpwd
+            - {{ .Values.dbPassword }}
+          readinessProbe:
+            exec:
+              command:
+                - curl
+                - http://localhost:1026/version
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - http://localhost:1026/version
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+ 

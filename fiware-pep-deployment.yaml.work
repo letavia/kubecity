@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pep-proxy
+  labels: 
+    app: pep-proxy
+    tier: idm
+spec:
+  type: LoadBalancer
+  ports:
+  - #name: normal
+    port: 80
+    targetPort: 1027
+  selector:
+    app: pep-proxy
+    tier: idm
+---
+
+ apiVersion: extensions/v1beta1
+ kind: Deployment
+ metadata:
+   name: pep-proxy
+   labels:
+     app: pep-proxy
+     tier: idm
+ spec:
+   replicas: 1
+   selector:
+    matchLabels:
+      app: pep-proxy
+      tier: idm
+   template:
+     metadata:
+       labels:
+         app: pep-proxy
+         tier: idm
+     spec:
+       containers:
+       - name: pep-proxy
+         image: fiware/pep-proxy
+         #command: ["cp", "config.js", "/opt/fiware-pep-proxy/config.js"]
+         #command: ["sleep", "10000"]
+         ports:
+         - containerPort: 1027
+         env:
+         - name: PEP_PROXY_PORT
+           value: "1027" #default 80
+         - name: PEP_PROXY_IDM_HOST
+           value: keyrock 
+         - name: PEP_PROXY_IDM_PORT
+           value: "3000"
+         - name: PEP_PROXY_HTTPS_ENABLED
+           value: "false" #default false
+         - name: PEP_PROXY_HTTPS_PORT
+           value: "443" #default 443
+         - name: PEP_PROXY_IDM_SSL_ENABLED
+           value: "false" #default true
+         - name: PEP_PROXY_APP_HOST
+           value: orion #default www.fiware.org
+         - name: PEP_PROXY_APP_PORT
+           value: "1026" #default 80
+         - name: PEP_PROXY_APP_SSL_ENABLED
+           value: "false" #default false - Use true if the app server listens in https
+         - name: PEP_PROXY_AUTH_ENABLED
+           value: "true" #default false
+         - name: PEP_PROXY_APP_ID
+           value: 5ed90fbd-0f7e-4615-b13b-fb6b93d42d5e
+         - name: PEP_PROXY_USERNAME
+           value: pep_proxy_7d607784-63d2-4e65-baf4-88ddaeace6be
+         - name: PEP_PASSWORD
+           value: pep_proxy_db23777d-c0c9-4545-bb5b-b837848fbd91
+         - name: PEP_PROXY_PDP
+           value: idm #default idm - idm/authzforce
+         - name: PEP_PROXY_AZF_PROTOCOL
+           value: http #default http
+         - name: PEP_PROXY_AZF_HOST
+           value: authzforce #default localhost
+         - name: PEP_PROXY_AZF_PORT
+           value: "8080" #default 8080
+         - name: PEP_PROXY_AZF_CUSTOM_POLICY
+           value: undefined #default which implies the usage of default policy checks (HTTP verb + path).
+         - name: PEP_PROXY_MAGIC_KEY
+           value: dodol
+

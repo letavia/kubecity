@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata: 
+   name: mysql-57
+spec: 
+   replicas: 2
+   selector:
+     matchLabels: 
+       app: fiware-idm
+       db: mysql-57       
+   template:
+     metadata:
+       labels:
+         app: fiware-idm
+         db: mysql-57      
+     spec:
+       containers:
+       - name: mysql
+         image: mysql/mysql-server:5.7.21
+         ports:
+         - containerPort: 3306
+           name: mysql
+         volumeMounts:
+         - mountPath: /var/lib/mysql
+           name: mysql-storage
+         env:
+         - name: MYSQL_ROOT_PASSWORD
+           value: idm
+       volumes:
+       - name: mysql-storage
+         persistentVolumeClaim:
+           claimName: mysql-pvc

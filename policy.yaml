@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Policy
+spec: 
+  user: thelenyoktavia@gmail.com
+  namespace: kubevent
+  resource: pods
+  readonly: "false"

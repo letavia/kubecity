@@ -1,0 +1,104 @@
+# Default values for wilma.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: fiware/pep-proxy
+  tag: 7.5.1
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+extraLabels:
+  tier: idm
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 1027
+  
+ports:
+  containerPort: 1027 
+  
+proxy:
+  port: 1027 
+  https: 
+    enabled: false 
+    port: 443 
+  app:
+    id: a99d9c0f-cce7-4717-b0c0-48b740002cfd
+    username: pep_proxy_66cdb599-d3c3-40db-a6bb-1804786851aa
+    password: pep_proxy_97bff1b1-5f15-4c90-9ef7-4e4cf8701112
+    host: orion-cb
+    port: 1026
+    ssl: 
+      enabled: false 
+  pdp: authzforce 
+  magicKey: kamvret
+    
+auth:
+  enabled: true 
+  
+idm:
+  port: 3000 
+  host: keyrock-idm
+  ssl:
+    enabled: false  
+    
+azf:
+  protocol: http 
+  host: authzforce 
+  port: 8080 
+  #customPolicy: undefined #default
+  
+token: {}
+  #secret: 
+  
+readinessProbe:
+  initialDelaySeconds: 5
+  timeoutSeconds: 1
+  failureThreshold: 3
+  periodSeconds: 10
+  successThreshold: 1
+
+# Liveness probe
+livenessProbe:
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+  periodSeconds: 10
+  successThreshold: 1
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  path: /
+  hosts:
+    - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

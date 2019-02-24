@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "iotagent-ul.fullname" . }}
+  labels:
+    app: {{ include "iotagent-ul.name" . }}
+    chart: {{ include "iotagent-ul.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: {{ .Values.service.ports.device.name }}
+      port: {{ .Values.service.ports.device.port }}
+      targetPort: {{ .Values.service.ports.device.targetPort }}
+    - name: {{ .Values.service.ports.admin.name }}
+      port: {{ .Values.service.ports.admin.port }}
+      targetPort: {{ .Values.service.ports.admin.targetPort }}
+  selector:
+    app: {{ include "iotagent-ul.name" . }}
+    release: {{ .Release.Name }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }}

@@ -1,0 +1,33 @@
+ apiVersion: extensions/v1beta1
+ kind: Deployment
+ metadata:
+   name: ul20client
+   labels:
+     app: ul20client
+     tier: iotagent-ul
+ spec:
+   replicas: 1
+   template:
+     metadata:
+       labels:
+         app: ul20client
+         tier: iotagent-ul
+     spec:
+       containers:
+       - name: ul20client
+         image: bitergia/ul20-client
+         #ports:
+         #- containerPort: 7896
+         #- containerPort: 4041
+         args: ["--fake", "--min 0", "--max 100", "--variance 5"]
+         env:
+         - name: UL20_IOTA_HOST
+           value: iotagent-ul
+         - name: UL20_IOTA_PORT
+           value: "7896"
+         - name: UL20_IOTA_ADMIN_PORT
+           value: "4041"
+         - name: UL20_API_KEY
+           value: iotakey
+         - name: UL20_SERVICE_NAME
+           value: iotagent-ul

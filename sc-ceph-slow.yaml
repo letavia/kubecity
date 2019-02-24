@@ -1,0 +1,8 @@
+  apiVersion: storage.k8s.io/v1
+  kind: StorageClass
+  metadata:
+    name: ceph-slow
+  provisioner: kubernetes.io/rbd
+  parameters:
+    fsType: ext4
+    imageFormat: "2"

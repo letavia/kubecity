@@ -1,0 +1,85 @@
+tourguide:
+    image: fiware/tutorials.tourguide-app:latest
+    hostname: tourguide
+    container_name: tourguide
+    links:
+        - orion
+        - keyrock
+        - idas
+        - cygnus
+    environment:
+        - ORION_HOSTNAME=orion
+        - ORION_NO_PROXY_HOSTNAME=orion
+        - ORION_PORT=1026
+        - ORION_PEP_ENABLED=false
+        - IDAS_PORT=7896
+        - IDAS_ADMIN_PORT=4041
+        - IDAS_FIWARE_SERVICE=tourguide
+        - IDAS_FIWARE_SERVICE_PATH=/
+        - IDAS_API_KEY=tourguide-devices
+        - IDM_HOSTNAME=keyrock
+        - IDM_PORT=8000
+    volumes_from:
+        - keyrock
+		
+apiVersion: v1
+kind: Service
+metadata:
+  name: tourguide
+  labels: 
+    app: tourguide
+spec:
+  type: LoadBalancer
+  ports:
+  - #name: normal
+    port: 80
+  selector:
+    app: tourguide
+---
+
+ apiVersion: extensions/v1beta1
+ kind: Deployment
+ metadata:
+   name: tourguide
+   labels:
+     app: tourguide
+ spec:
+   replicas: 1
+   selector:
+    matchLabels:
+      app: tourguide
+   template:
+     metadata:
+       labels:
+         app: tourguide
+     spec:
+       containers:
+       - name: tourguide
+         image: fiware/tutorials.tourguide-app
+         ports:
+         - containerPort: 5050
+         env:
+         - name: ORION_HOSTNAME
+           value: orion
+         - name: ORION_NO_PROXY_HOSTNAME
+           value: orion
+         - name: ORION_PORT
+           value: 1026
+         - name: ORION_PEP_ENABLED
+           value: false
+         - name: IDAS_PORT
+           value: 7896
+         - name: IDAS_ADMIN_PORT
+           value: 4041
+         - name: IDAS_FIWARE_SERVICE
+           value: tourguide
+         - name: IDAS_FIWARE_SERVICE_PATH
+           value: /
+         - name: IDAS_API_KEY
+           value: tourguide-devices
+         - name: IDM_HOSTNAME
+           value: keyrock
+         - name: IDM_PORT
+           value: 8000
+    #volumes_from:
+        #- keyrock

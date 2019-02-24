@@ -1,0 +1,134 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: keyrock
+  labels: 
+    app: keyrock
+    tier: idm
+spec:
+  type: LoadBalancer
+  ports:
+  - name: idm-normal
+    port: 3000
+    targetPort: 3000
+  - name: idm-ssl
+    port: 443
+    targetPort: 443
+  - name: auth-token-ext
+    port: 8000
+    targetPort: 8000
+  - name: auth-token-int
+    port: 5000
+    targetPort: 5000    
+  - name: azf
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: keyrock
+    tier: idm
+---
+
+ apiVersion: extensions/v1beta1
+ kind: Deployment
+ metadata:
+   name: keyrock
+   labels:
+     app: keyrock
+     tier: idm
+ spec:
+   replicas: 2
+   selector:
+    matchLabels:
+      app: keyrock
+      tier: idm
+   template:
+     metadata:
+       labels:
+         app: keyrock
+         tier: idm
+     spec:
+       containers:
+       - name: keyrock
+         image: fiware/idm:7.5.1
+         ports:
+         - containerPort: 3000
+         - containerPort: 443
+         - containerPort: 8080
+         env:
+         - name: IDM_HOST
+           value: http://localhost:3000
+         - name: DATABASE_HOST #default localhost
+           value: mysql-mysqlha
+         - name: IDM_DB_PASS
+           value: mysql #default idm
+         - name: IDM_DB_NAME 
+           value: idm #default idm
+         - name: IDM_ADMIN_USER
+           value: dodol #default admin
+         - name: IDM_ADMIN_EMAIL 
+           value: dodol@dodol.com #default admin@test.com
+         - name: IDM_ADMIN_PASS
+           value: dodol #default 1234
+         - name: IDM_AUTHZFORCE_ENABLED
+           value: "true" #default false
+         - name: IDM_AUTHZFORCE_HOST
+           value: authzforce #default idm
+         - name: IDM_AUTHZFORCE_PORT
+           value: "8080"
+         - name: IDM_PDP_LEVEL
+           value: advanced
+         - name: IDM_SESSION_SECRET
+           value: keyrock
+         - name: IDM_ENCRYPTION_KEY
+           value: idm
+         readinessProbe:
+            exec:
+              command:
+                - curl
+                - http://localhost:3000
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            periodSeconds: 5
+            successThreshold: 2
+         livenessProbe:
+            exec:
+              command:
+                - curl
+                - http://localhost:3000
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+            periodSeconds: 30
+            successThreshold: 1
+
+           
+#IDM_HOST "http://localhost:3000" \
+#IDM_PORT "3000" \
+#IDM_PDP_LEVEL "basic" \
+#IDM_DIALECT "mysql" \
+#IDM_EMAIL_HOST "localhost" \
+#IDM_EMAIL_PORT "25" \
+#IDM_EMAIL_ADDRESS "noreply@localhost"
+# ENV IDM_ADMIN_ID    "admin"
+# ENV IDM_SESSION_SECRET "nodejs_idm" 
+# ENV IDM_ENCRYPTION_KEY "nodejs_idm" 
+# ENV IDM_DB_USER "root"
+# ENV IDM_EX_AUTH_DB_USER "db_user"
+# ENV IDM_EX_AUTH_DB_PASS "db_pass"
+
+# ENV IDM_HTTPS_ENABLED false
+# ENV IDM_HTTPS_PORT "443"
+
+# ENV IDM_AUTHZFORCE_ENABLED false
+# ENV IDM_AUTHZFORCE_HOST "localhost"
+# ENV IDM_AUTHZFORCE_PORT" 8080"
+
+# ENV IDM_EX_AUTH_ENABLED false
+# ENV IDM_EX_AUTH_DRIVER "custom_authentication_driver"
+# ENV IDM_EX_AUTH_DAB_HOST "localhost"
+# ENV IDM_EX_AUTH_DB_NAME "db_name"
+# ENV IDM_EX_AUTH_DB_USER_TABLE "user"
+# ENV IDM_EX_AUTH_DIALECT "mysql"
+           
+           

@@ -1,0 +1,187 @@
+apiVersion: v1
+entries:
+  keyrock:
+  - apiVersion: v1
+    appVersion: "1.0"
+    created: 2019-01-09T00:01:38.0378208+01:00
+    description: A Helm chart for Kubernetes
+    digest: 6a7845c1fba6ade978481b8581cd3be3edfe72d34252edacbc33c7e82baf56c4
+    name: keyrock
+    urls:
+    - http://127.0.0.1:8879/Charts%5C/keyrock-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v1
+    appVersion: "1.0"
+    created: 2019-01-09T00:01:38.0588395+01:00
+    description: A Helm chart for Kubernetes
+    digest: 6a7845c1fba6ade978481b8581cd3be3edfe72d34252edacbc33c7e82baf56c4
+    name: keyrock
+    urls:
+    - http://127.0.0.1:8879/keyrock%5C/keyrock-0.1.0.tgz
+    version: 0.1.0
+  mongodb-replicaset:
+  - appVersion: "3.6"
+    created: 2019-01-09T00:01:38.040824+01:00
+    description: NoSQL document-oriented database that stores JSON-like documents
+      with dynamic schemas, simplifying the integration of data in content-driven
+      applications.
+    digest: 96166f0d014327ad6c3813365476bd0870c7961cfcddcac990ff9f9be55c2783
+    home: https://github.com/mongodb/mongo
+    icon: https://webassets.mongodb.com/_com_assets/cms/mongodb-logo-rgb-j6w271g1xn.jpg
+    maintainers:
+    - email: ramanathana@google.com
+      name: foxish
+    - email: unguiculus@gmail.com
+      name: unguiculus
+    name: mongodb-replicaset
+    sources:
+    - https://github.com/mongodb/mongo
+    - https://github.com/percona/mongodb_exporter
+    urls:
+    - http://127.0.0.1:8879/Charts%5C/mongodb-replicaset-3.6.1.tgz
+    version: 3.6.1
+  - appVersion: "3.6"
+    created: 2019-01-09T00:01:38.0618427+01:00
+    description: NoSQL document-oriented database that stores JSON-like documents
+      with dynamic schemas, simplifying the integration of data in content-driven
+      applications.
+    digest: 96166f0d014327ad6c3813365476bd0870c7961cfcddcac990ff9f9be55c2783
+    home: https://github.com/mongodb/mongo
+    icon: https://webassets.mongodb.com/_com_assets/cms/mongodb-logo-rgb-j6w271g1xn.jpg
+    maintainers:
+    - email: ramanathana@google.com
+      name: foxish
+    - email: unguiculus@gmail.com
+      name: unguiculus
+    name: mongodb-replicaset
+    sources:
+    - https://github.com/mongodb/mongo
+    - https://github.com/percona/mongodb_exporter
+    urls:
+    - http://127.0.0.1:8879/mongodb-replicaset%5C/mongodb-replicaset-3.6.1.tgz
+    version: 3.6.1
+  mysqlha:
+  - appVersion: 5.7.13
+    created: 2019-01-09T00:01:38.034823+01:00
+    description: MySQL cluster with a single master and zero or more slave replicas
+    digest: cac1c0cbc899f050d6b8db336e0c5ef936182b594fe0dfee374b136997b2b400
+    home: https://www.mysql.com/
+    icon: https://www.mysql.com/common/logos/logo-mysql-170x115.png
+    keywords:
+    - mysql
+    - database
+    - sql
+    maintainers:
+    - email: jason.poon@microsoft.com
+      name: jpoon
+    - email: jon.bitbucket@livewire-uk.co.uk
+      name: jonhoare
+    name: mysqlha
+    urls:
+    - http://127.0.0.1:8879/mysqlha-0.4.0.tgz
+    version: 0.4.0
+  - appVersion: 5.7.13
+    created: 2019-01-09T00:01:38.0428266+01:00
+    description: MySQL cluster with a single master and zero or more slave replicas
+    digest: 2998150a6813dabc0d9118dfef9e004499111bd3a71e383798ee27313705be2d
+    home: https://www.mysql.com/
+    icon: https://www.mysql.com/common/logos/logo-mysql-170x115.png
+    keywords:
+    - mysql
+    - database
+    - sql
+    maintainers:
+    - email: jason.poon@microsoft.com
+      name: jpoon
+    - email: jon.bitbucket@livewire-uk.co.uk
+      name: jonhoare
+    name: mysqlha
+    urls:
+    - http://127.0.0.1:8879/Charts%5C/mysqlha-0.4.0.old.tgz
+    version: 0.4.0
+  - appVersion: 5.7.13
+    created: 2019-01-09T00:01:38.0508363+01:00
+    description: MySQL cluster with a single master and zero or more slave replicas
+    digest: 5738b0722cd5042479bfaa025db3c46766f3bb548680ac5e4a9e5c564145622f
+    home: https://www.mysql.com/
+    icon: https://www.mysql.com/common/logos/logo-mysql-170x115.png
+    keywords:
+    - mysql
+    - database
+    - sql
+    maintainers:
+    - email: jason.poon@microsoft.com
+      name: jpoon
+    - email: jon.bitbucket@livewire-uk.co.uk
+      name: jonhoare
+    name: mysqlha
+    urls:
+    - http://127.0.0.1:8879/Charts%5C/mysqlha-0.4.0.tgz
+    version: 0.4.0
+  - appVersion: 5.7.13
+    created: 2019-01-09T00:01:38.0668501+01:00
+    description: MySQL cluster with a single master and zero or more slave replicas
+    digest: 5738b0722cd5042479bfaa025db3c46766f3bb548680ac5e4a9e5c564145622f
+    home: https://www.mysql.com/
+    icon: https://www.mysql.com/common/logos/logo-mysql-170x115.png
+    keywords:
+    - mysql
+    - database
+    - sql
+    maintainers:
+    - email: jason.poon@microsoft.com
+      name: jpoon
+    - email: jon.bitbucket@livewire-uk.co.uk
+      name: jonhoare
+    name: mysqlha
+    urls:
+    - http://127.0.0.1:8879/mysqlha%5C/mysqlha-0.4.0.tgz
+    version: 0.4.0
+  - appVersion: 5.7.13
+    created: 2019-01-09T00:01:38.0698516+01:00
+    description: MySQL cluster with a single master and zero or more slave replicas
+    digest: 2e9f2b8c9f38075a9470a5f68d22d4ae94a0cca0564e2b6937854a1ea38a325d
+    home: https://www.mysql.com/
+    icon: https://www.mysql.com/common/logos/logo-mysql-170x115.png
+    keywords:
+    - mysql
+    - database
+    - sql
+    maintainers:
+    - email: jason.poon@microsoft.com
+      name: jpoon
+    - email: jon.bitbucket@livewire-uk.co.uk
+      name: jonhoare
+    name: mysqlha
+    urls:
+    - http://127.0.0.1:8879/mysqlha.old%5C/mysqlha-0.4.0.tgz
+    version: 0.4.0
+  orion:
+  - apiVersion: v1
+    appVersion: "2.0"
+    created: 2019-01-09T00:01:38.0548363+01:00
+    description: A Helm chart for Kubernetes
+    digest: d147e6b411aacceba7422237b71625f632cde65b143e83ccc3f4c5ac1bc2abcd
+    name: orion
+    urls:
+    - http://127.0.0.1:8879/Charts%5C/orion-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v1
+    appVersion: "2.0"
+    created: 2019-01-09T00:01:38.0758181+01:00
+    description: A Helm chart for Kubernetes
+    digest: d147e6b411aacceba7422237b71625f632cde65b143e83ccc3f4c5ac1bc2abcd
+    name: orion
+    urls:
+    - http://127.0.0.1:8879/orion%5C/orion-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v1
+    appVersion: "1.0"
+    created: 2019-01-09T00:01:38.0548363+01:00
+    description: A Helm chart for Kubernetes
+    digest: 00c8bee9268e69f5e2bf617270cc1b4e918f44c3b8e7cff1034dbee87eef1bf2
+    name: orion
+    urls:
+    - http://127.0.0.1:8879/helm-chart%5C/orion-0.1.0.tgz
+    version: 0.1.0
+generated: 2019-01-09T00:01:38.0308141+01:00

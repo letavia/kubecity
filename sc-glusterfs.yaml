@@ -1,0 +1,19 @@
+apiVersion: storage.k8s.io/v1beta1
+kind: StorageClass
+metadata:
+  name: glusterfs-sc
+  #namespace: kubevent
+  annotations: 
+     storageclass.kubernetes.io/is-default-class: "true"
+provisioner: kubernetes.io/glusterfs
+parameters:
+  resturl: "http://35.184.81.0:8080"
+  #clusterid: "3cc10f0a087efcf5005b989f61f6608c"
+  #restuser: "dodol"
+  #secretNamespace: "default"
+  #secretName: "glusterfs-secret"
+  #gidMin: "40000"
+  #gidMax: "50000"
+  #volumetype: "replicate:3"
+allowVolumeExpansion: true
+reclaimPolicy: Retain

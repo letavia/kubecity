@@ -1,0 +1,11 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: test 
+  namespace: default
+  #storageclass.kubernetes.io/is-default-class: "true"
+provisioner: kubernetes.io/nfs
+parameters:
+    server: nfs-server.default.svc.cluster.local 
+    # 10.39.244.61 
+    path: "/"

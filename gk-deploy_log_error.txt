@@ -1,0 +1,87 @@
+salsasoldiers@cloudshell:~/gluster-kubernetes/deploy (kubecity-215221)$ ./gk-deploy -gyv
+Using Kubernetes CLI.
+
+Checking status of namespace matching 'default':
+default   Active    4h
+Using namespace "default".
+Checking for pre-existing resources...
+  GlusterFS pods ...
+Checking status of pods matching '--selector=glusterfs=pod':
+
+Timed out waiting for pods matching '--selector=glusterfs=pod'.
+not found.
+  deploy-heketi pod ...
+Checking status of pods matching '--selector=deploy-heketi=pod':
+
+Timed out waiting for pods matching '--selector=deploy-heketi=pod'.
+not found.
+  heketi pod ...
+Checking status of pods matching '--selector=heketi=pod':
+
+Timed out waiting for pods matching '--selector=heketi=pod'.
+not found.
+  gluster-s3 pod ...
+Checking status of pods matching '--selector=glusterfs=s3-pod':
+
+Timed out waiting for pods matching '--selector=glusterfs=s3-pod'.
+not found.
+Creating initial resources ... /google/google-cloud-sdk/bin/kubectl -n default create -f /home/salsasoldiers/gluster-kubernetes/deploy/kube-templates/heketi-service-account.yaml 2>&1
+serviceaccount "heketi-service-account" created
+/google/google-cloud-sdk/bin/kubectl -n default create clusterrolebinding heketi-sa-view --clusterrole=edit --serviceaccount=default:heketi-service-account 2>&1
+clusterrolebinding "heketi-sa-view" created
+/google/google-cloud-sdk/bin/kubectl -n default label --overwrite clusterrolebinding heketi-sa-view glusterfs=heketi-sa-view heketi=sa-view
+clusterrolebinding "heketi-sa-view" labeled
+OK
+Marking 'gke-kubecity-default-pool-9cfaf6b1-7fcj' as a GlusterFS node.
+/google/google-cloud-sdk/bin/kubectl -n default label nodes gke-kubecity-default-pool-9cfaf6b1-7fcj storagenode=glusterfs --overwrite 2>&1
+node "gke-kubecity-default-pool-9cfaf6b1-7fcj" not labeled
+Marking 'gke-kubecity-default-pool-9cfaf6b1-hxpd' as a GlusterFS node.
+/google/google-cloud-sdk/bin/kubectl -n default label nodes gke-kubecity-default-pool-9cfaf6b1-hxpd storagenode=glusterfs --overwrite 2>&1
+node "gke-kubecity-default-pool-9cfaf6b1-hxpd" not labeled
+Marking 'gke-kubecity-default-pool-9cfaf6b1-vvm5' as a GlusterFS node.
+/google/google-cloud-sdk/bin/kubectl -n default label nodes gke-kubecity-default-pool-9cfaf6b1-vvm5 storagenode=glusterfs --overwrite 2>&1
+node "gke-kubecity-default-pool-9cfaf6b1-vvm5" not labeled
+Deploying GlusterFS pods.
+sed -e 's/storagenode\: glusterfs/storagenode\: 'glusterfs'/g' /home/salsasoldiers/gluster-kubernetes/deploy/kube-templates/glusterfs-daemonset.yaml | /google/google-cloud-sdk/bin/kubectl -n default create -f - 2>&1
+daemonset "glusterfs" created
+Waiting for GlusterFS pods to start ...
+Checking status of pods matching '--selector=glusterfs=pod':
+glusterfs-2dn95   1/1       Running   0         1m
+glusterfs-kfz4w   1/1       Running   0         1m
+glusterfs-ppznk   1/1       Running   0         1m
+OK
+/google/google-cloud-sdk/bin/kubectl -n default create secret generic heketi-config-secret --from-file=private_key=/dev/null --from-file=./heketi.json --from-file=topology.json=topology.json
+secret "heketi-config-secret" created
+/google/google-cloud-sdk/bin/kubectl -n default label --overwrite secret heketi-config-secret glusterfs=heketi-config-secret heketi=config-secret
+secret "heketi-config-secret" labeled
+sed -e 's/\${HEKETI_EXECUTOR}/kubernetes/' -e 's#\${HEKETI_FSTAB}#/var/lib/heketi/fstab#' -e 's/\${HEKETI_ADMIN_KEY}//' -e 's/\${HEKETI_USER_KEY}//' /home/salsasoldiers/gluster-kubernetes/deploy/kube-templates/deploy-heketi-deployment.yaml | /google/google-cloud-sdk/bin/kubectl -n default create -f - 2>&1
+service "deploy-heketi" created
+deployment "deploy-heketi" created
+Waiting for deploy-heketi pod to start ...
+Checking status of pods matching '--selector=deploy-heketi=pod':
+deploy-heketi-6c7d48f8b-rhd9j   1/1       Running   0         6s
+OK
+Determining heketi service URL ... OK
+/google/google-cloud-sdk/bin/kubectl -n default exec -i deploy-heketi-6c7d48f8b-rhd9j -- heketi-cli -s http://localhost:8080 --user admin --secret '' topology load --json=/etc/heketi/topology.json 2>&1
+Creating cluster ... ID: 795d1c60fcba656d2354e6e8d1a343c9
+Allowing file volumes on cluster.
+Allowing block volumes on cluster.
+Creating node gke-kubecity-default-pool-9cfaf6b1-7fcj ... ID: 9283c520554c27d1414de619fd317596
+Adding device /dev/sdc ... OK
+Creating node gke-kubecity-default-pool-9cfaf6b1-hxpd ... ID: 214d87ce3471d90557443c050a68bd75
+Adding device /dev/sdc ... OK
+Creating node gke-kubecity-default-pool-9cfaf6b1-vvm5 ... ID: 0e965f55fae3195cd3239c03c18ef8f3
+Adding device /dev/sdc ... OK
+heketi topology loaded.
+/google/google-cloud-sdk/bin/kubectl -n default exec -i deploy-heketi-6c7d48f8b-rhd9j -- heketi-cli -s http://localhost:8080 --user admin --secret '' setup-openshift-heketi-storage --listfile=/tmp/heketi-storage.json  2>&1
+Saving /tmp/heketi-storage.json
+/google/google-cloud-sdk/bin/kubectl -n default exec -i deploy-heketi-6c7d48f8b-rhd9j -- cat /tmp/heketi-storage.json | /google/google-cloud-sdk/bin/kubectl -n default create -f - 2>&1
+secret "heketi-storage-secret" created
+endpoints "heketi-storage-endpoints" created
+service "heketi-storage-endpoints" created
+job "heketi-storage-copy-job" created
+
+Checking status of pods matching '--selector=job-name=heketi-storage-copy-job':
+
+Timed out waiting for pods matching '--selector=job-name=heketi-storage-copy-job'.
+Error waiting for job 'heketi-storage-copy-job' to complete.

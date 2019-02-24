@@ -1,0 +1,23 @@
+#!/bin/bash
+heketi-cli volume delete 043aa9281384a93a72301b6cf78fcde5
+heketi-cli volume delete 070a1631d74932d24b55e22b17bd24c0
+heketi-cli volume delete 1062dd8be27caa568470503ee82ec187
+heketi-cli volume delete 23b7d05a0e120b63d8e57df1e5560fb0
+heketi-cli volume delete 59475e2bf7c8e523dd96d896a542f196
+heketi-cli volume delete 77cb2996acbb1629ce4541f113ab1ce3
+heketi-cli volume delete 894b9b09747c6a40cd545a5caf646b1f
+heketi-cli volume delete 8fe2313c4900bad527a70bf40511a6e0
+heketi-cli volume delete 98f2b2ae5227c279bb3f41ba2b8e8a48
+heketi-cli volume delete a4c7d27cd56ba3fe07ccb5f88c0763c9
+heketi-cli volume delete b64742ace360dd212719809002fda21d
+heketi-cli volume delete bbf425520cf76395e219faeff702ba2b
+heketi-cli volume delete bd21e695e39b6ef1047ff27b560f5ed7
+heketi-cli volume delete c11a0cc37d41192f7da6975e8728115c
+heketi-cli volume delete c2a4e187b01e8587183e989c74226e37
+heketi-cli volume delete c9acdbeec20f6f050758414da5f2dc51
+heketi-cli volume delete cfdf5a7e18c3b67b9970b74a437490d0
+heketi-cli volume delete d1c7d16412f4cdce616e229b4b4b1aff
+heketi-cli volume delete 
+
+
+

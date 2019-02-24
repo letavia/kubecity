@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "iotagent-ul.fullname" . }}
+  labels:
+    app: {{ include "iotagent-ul.name" . }}
+    chart: {{ include "iotagent-ul.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "iotagent-ul.name" . }}
+      release: {{ .Release.Name }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 6 }}
+{{- end }}      
+  template:
+    metadata:
+      labels:
+        app: {{ include "iotagent-ul.name" . }}
+        release: {{ .Release.Name }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 8 }}
+{{- end }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.ports.device }}
+            - containerPort: {{ .Values.ports.admin }}
+          env:
+          - name: IOTA_CB_HOST
+            value: {{ .Values.contextBroker.host }}
+          - name: IOTA_CB_PORT
+            value: {{ quote .Values.contextBroker.port }}
+          - name: IOTA_NORTH_PORT
+            value: {{ quote .Values.agent.northPort }}
+          - name: IOTA_REGISTRY_TYPE
+            value: {{ .Values.agent.registryType }}
+          - name: IOTA_LOG_LEVEL
+            value: {{ .Values.agent.logLevel }}
+          - name: IOTA_TIMESTAMP
+            value: {{ quote .Values.agent.timestamp }}
+          - name: IOTA_MONGO_HOST
+            value: {{ .Values.database.host }}
+          - name: IOTA_MONGO_PORT
+            value: {{ quote .Values.database.port }}
+          - name: IOTA_MONGO_DB
+            value: {{ .Values.database.name }}
+          - name: IOTA_MONGO_REPLICASET
+            value: {{ .Values.database.replicaSet }}
+          - name: IOTA_MONGO_USERNAME
+            value: {{ .Values.database.username }}
+          - name: IOTA_MONGO_PASSWORD
+            value: {{ .Values.database.password }}
+          - name: IOTA_MONGO_AUTH_DB
+            value: {{ .Values.database.authDB }}
+          - name: IOTA_HTTP_PORT
+            value: {{ quote .Values.agent.httpPort }}
+          - name: IOTA_PROVIDER_URL
+            value: {{ .Values.agent.providerURL }}
+          - name: IOTA_AUTH_ENABLED
+            value: {{ quote .Values.auth.enabled }}
+          - name: IOTA_AUTH_TYPE
+            value: {{ .Values.auth.type }}
+          - name: IOTA_AUTH_HEADER
+            value: {{ .Values.auth.header }}         
+          - name: IOTA_AUTH_HOST
+            value: {{ .Values.auth.host }}
+          - name: IOTA_AUTH_PORT
+            value: {{ quote .Values.auth.port }} 
+          - name: IOTA_AUTH_USER
+            value: {{ .Values.auth.user }}         
+          - name: IOTA_AUTH_PASSWORD
+            value: {{ .Values.auth.password }}
+          - name: IOTA_AUTH_PERMANENT_TOKEN
+            value: {{ .Values.auth.permanent_token }} 
+
+
+

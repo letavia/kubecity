@@ -1,0 +1,13 @@
+apiVersion: v1
+entries:
+  orion:
+  - apiVersion: v1
+    appVersion: "2.0"
+    created: 2018-10-21T13:25:07.4136721+02:00
+    description: A Helm chart for Kubernetes
+    digest: 59ba53a4cbe4242b27a086e6a4f4c985c530ad9c7848b3dc9db5ed1182b6e751
+    name: orion
+    urls:
+    - http://127.0.0.1:8879/orion-0.2.0.tgz
+    version: 0.2.0
+generated: 2018-10-21T13:25:07.3445508+02:00

@@ -1,0 +1,6 @@
+spec:
+  volumeClaimTemplates:
+    spec:
+      resources:
+        requests:
+          storage: 5Gi

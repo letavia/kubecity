@@ -1,0 +1,17 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: test
+  #namespace: default
+  #annotations:
+   #  volume.beta.kubernetes.io/storage-class: "test"
+spec:
+  #mountOptions: 
+  storageClassName: glusterfs-sc
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+      

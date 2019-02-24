@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubecity-sa
+  namespace: kubecity
+
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: kubecity-admin-role
+  namespace: kubecity
+rules:
+- apiGroups: ["", "extensions", "apps","rbac.authorization.k8s.io","kubernetes.io","horizontalpodautoscalers"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  - cronjobs
+  verbs: ["*"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: kubecity-admin-rb
+  namespace: kubecity
+subjects:
+- kind: ServiceAccount
+  name: kubecity-sa
+  namespace: kubecity
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: kubecity-admin-role

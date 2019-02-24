@@ -1,0 +1,32 @@
+apiVersion: settings.k8s.io/v1alpha1
+kind: PodPreset
+metadata:
+  name: mongodb-preset
+spec:
+  selector:
+    matchLabels:
+      tier: mongodb
+  env:
+        - name: VERSION
+          value: V1
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: password
+  volumeMounts:
+        - name: pvc
+          mountPath: /data/db
+          subPath: db
+        - name: pvc
+          mountPath: /mnt
+          subPath: config
+  volumes:
+    - name: 
+      secret: 
+       name: mongodb-secret

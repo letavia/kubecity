@@ -1,0 +1,61 @@
+mongo -u "$MONGO_INITDB_ROOT_USERNAME" -p "$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin
+
+mongo --eval 'db.getSiblingDB("admin").auth("$MONGO_INITDB_ROOT_USERNAME", "$MONGO_INITDB_ROOT_PASSWORD")'
+db.getSiblingDB('admin').auth("root", "mongodb");
+
+db.getSiblingDB("admin").createUser({user:"'"$MONGO_INITDB_ROOT_USERNAME"'",pwd:"'"$MONGO_INITDB_ROOT_PASSWORD"'",roles:[{role:"root",db:"admin"}]});
+
+db.getSiblingDB("admin").createUser({user:"orion",pwd:"orion",roles:[{role:"readWrite",db:"orion"}]});
+
+db.getSiblingDB("admin").auth("'${MONGO_INITDB_ROOT_USERNAME}'", "'${MONGO_INITDB_ROOT_PASSWORD}'");
+mongo --eval 'db.getSiblingDB("admin").auth("'"${MONGO_INITDB_ROOT_USERNAME}"'", "'"${MONGO_INITDB_ROOT_PASSWORD}"'")';
+db.getSiblingDB('admin').auth("orion", "orion");
+
+db.getSiblingDB("admin").createUser({user:"'"$MONGO_INITDB_ROOT_USERNAME"'",pwd:"'"$MONGO_INITDB_ROOT_PASSWORD"'",roles:[{role:"root",db:"admin"}]});
+mongo --eval 'db.getSiblingDB("admin").createUser({user:"'"${MONGO_INITDB_ROOT_USERNAME}"'",pwd:"'"${MONGO_INITDB_ROOT_PASSWORD}"'",roles:[{role:"root",db:"admin"}]});' --worked
+db.getSiblingDB("admin").createUser({user:"'${MONGO_INITDB_ROOT_USERNAME}'",pwd:"'${MONGO_INITDB_ROOT_PASSWORD}'",roles:[{role:"root",db:"admin"}]});
+
+'while (rs.status().hasOwnProperty("myState") && rs.status().myState != 1) { print("."); sleep(1000); }; db.getSiblingDB("admin").createUser({user:"'"${MONGO_INITDB_ROOT_USERNAME}"'",pwd:"'"${MONGO_INITDB_ROOT_PASSWORD}"'",roles:[{role:"root",db:"admin"}]});'
+
+mongo --eval 'db.getSiblingDB("admin").createUser({user:"'${MONGO_INITDB_ROOT_USERNAME}'",pwd:"'${MONGO_INITDB_ROOT_PASSWORD}'",roles:[{role:"root",db:"admin"}]})';
+
+for ((i = 0; i < 3; ++i)); do kubectl exec --namespace kubetest mongodb-rs-mongodb-replicaset-$i -- sh -c 'mongo --eval="printjson(rs.isMaster())"'; done
+
+db.createUser({user:"kampret",pwd:"kampret",roles:[{role:"readWrite",db:"admin"}]})
+
+
+db.testcol.insert({
+"id": "SpiderMan",
+"type": "SuperHeroes",
+"location": {
+"type": "Hanging",
+"value": 123.3434,
+"metadata": {}
+}
+})
+
+--tiller-namespace=kubetest
+db.setSlaveOk(1kubectl 
+create secret generic mongo-secret-generic --from-literal=user=root --from-literal=password=mongodb
+
+helm delete mongodb-rs --purge --no-hooks --tiller-namespace kubetest
+helm install --name mongodb-rs -f values.yaml stable/mongodb-replicaset --tiller-namespace kubetest
+
+#!/bin/bash
+mongo -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin
+show dbs
+use orion-test
+db.setSlaveOk(1);
+db.entities.find()
+
+#!/bin/bash
+kubectl get exec -it mongod-lol-0 -- bash
+mongo
+            - -dbhost
+            - {{ .Values.dbhost }}
+            - -dbuser
+            - $(MONGO_INITDB_ROOT_USERNAME)
+            - -dbpwd
+            - $(MONGO_INITDB_ROOT_PASSWORD)  
+			
+			

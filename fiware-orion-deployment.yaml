@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: orion-cb
+  labels:
+    app: context-broker
+    tier: orion
+spec:
+  ports:
+    - port: 1026
+  selector:
+    tier: orion
+  #clusterIP: None
+  type: LoadBalancer
+---
+
+apiVersion: apps/v1 #for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: orion-cb
+  labels:
+    app: context-broker
+    tier: orion
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: context-broker
+      tier: orion
+  #strategy:
+    #type: Recreate
+  template:
+    metadata:
+      labels:
+        app: context-broker
+        tier: orion
+    spec:
+      containers:
+      - image: fiware/orion:2.0.0
+        name: orion-cb
+        env:
+        - name: VERSION
+          value: V1
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: user
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: password
+        ports:
+        - containerPort: 1026
+          name: orion  
+        args: ["-dbhost","mongodb-mongodb-replicaset","-dbuser","$(MONGO_INITDB_ROOT_USERNAME)","-dbpwd","$(MONGO_INITDB_ROOT_PASSWORD)"]

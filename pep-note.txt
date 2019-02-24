@@ -1,0 +1,57 @@
+client -> pep -> idm -> pep -> authzforce -> pep -> orion
+
+idm 
+client id: 39ee65ff-742b-4367-9b9c-18edd6fbbc9b
+client secret: 33984539-af16-4550-ac3b-3ee14bbcd89b
+
+pep-proxy:
+pep id: e3aa55e0-277e-429b-a60d-29b72670ea6b
+pep username: pep_proxy_0c4288ce-ff2e-4a19-9814-43ca4a529de9
+pep password: pep_proxy_f90c51b9-e50a-4185-a02b-08ba88e5104b
+
+token: OWNlNmU3MjAtMGQ2Yy00Mjg5LWEyOTEtZmZhYjlhYzg5YTY4OmFkZWM0YWZmLWRiNTEtNDRlMS05NTcwLWM1ZDU4MjVkZGQyMyANCg==
+
+access token: 
+dodol: d025ffb2102b39c9788ca74a7ad8c64dbeb5f5fb
+kubevent: cb794a7e9089b735582a7b6efa67fe757f7fd259
+
+http://35.228.136.142:8080/authzforce-ce/domains
+
+curl -s --request POST \
+--header "Accept: application/xml" \
+--header "Content-Type: application/xml;charset=UTF-8" \
+--data '<?xml version="1.0" encoding="UTF-8"?><taz:domainProperties xmlns:taz="http://authzforce.github.io/rest-api-model/xmlns/authz/5" externalId="test" />' \
+ http://authzforce:8080/authzforce-ce/domains
+ 
+ <domainProperties xmlns="http://authzforce.github.io/rest-api-model/xmlns/authz/5" 
+    externalId="my.test.domain">
+    <description>This is a test domain.</description>
+</domainProperties>
+
+http://localhost:3000/device/monitor
+http://localhost:3000/app/monitor
+http://localhost:3000/health/static
+
+
+GET http://35.228.76.209:3000/oauth2/authorize?response_type=code&client_id=25d4e0b8-1869-4978-82fb-e7886e28db30&redirect_uri=http://nibbler.silktide.com
+
+http://35.228.214.89:3000//user?access_token=4953e3b96061ade18ee08f1db101fa167be3adf6&action=GET&app_id=9ce6e720-0d6c-4289-a291-ffab9ac89a68&resource=en_US/pro
+
+l3t4v14@gmail.com
+
+dodol@dodol.com:dodol ZG9kb2xAZG9kb2wuY29tOmRvZG9sIA0K
+
+9ce6e720-0d6c-4289-a291-ffab9ac89a68:adec4aff-db51-44e1-9570-c5d5825ddd23 
+9ce6e720-0d6c-4289-a291-ffab9ac89a68:adec4aff-db51-44e1-9570-c5d5825ddd23
+
+ZGJjNmFkN2EtNDE1My00NDE4LTlhYTUtZjJjNzg4MWFiOTA0OmYxZDY2ZmZlLTE5OWEtNDc2Yy1iM2QyLTlmNDU5NGViZGVlNiANCg==
+
+  "levels": {
+  	"Server": "DEBUG",
+    "Root": "INFO",
+    "HTTP-Client": "WARN",
+    "AZF-Client": "INFO",
+    "IDM-Client": "INFO",
+    "Test": "DEBUG"
+
+http://35.228.39.105:3000/user?access_token=encodeURIComponent(8ca5f601ca2b69a19a70eb06bb625008cf1e0e55)&action=GET&resource=en_US/about

@@ -1,0 +1,99 @@
+# Default values for iotagent-ul.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: letavia/iotaul
+  tag: latest-rev
+  pullPolicy: Always
+
+nameOverride: ""
+fullnameOverride: "iotagent"
+
+extraLabels:
+  tier: iot
+
+service:
+  type: LoadBalancer
+  ports:
+    device: 
+      name: device
+      port: 7896
+      targetPort: 7896
+    admin:
+      name: admin
+      port: 4041
+      targetPort: 4041  
+      
+ports:
+  device: 7896
+  admin: 4041
+
+#context-broker
+contextBroker:
+  host: orion-cb
+  port: 1026
+  
+database:
+  host: mongodb-rs-kubecity
+  port: 27017
+  name: iotaul
+  username: root
+  password: mongodb
+  replicaSet: kubecity-rs
+  authDB: admin
+  
+agent:
+  northPort: 4041
+  registryType: mongodb
+  logLevel: DEBUG
+  timestamp: true
+  httpPort: 7896
+  providerURL: "http://iotagent:4041"
+  adminUser: root
+  adminPassword: mongodb
+  
+auth:
+  enabled: true
+  type: password
+  header: x-auth-token
+  host: keyrock-idm
+  port: 3000
+  user: quints@quints.com
+  password: quints
+  permanent_token: 3fb3d7bb48a4fa145f783511ca4662375ff8d2e8
+  
+  
+  
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  path: /
+  hosts:
+    - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

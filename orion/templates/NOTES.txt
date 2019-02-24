@@ -1,0 +1,1 @@
+http://35.228.136.142:8080/authzforce-ce/domains

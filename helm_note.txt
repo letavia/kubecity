@@ -1,0 +1,64 @@
+          livenessProbe:
+            httpGet:
+              host: {{ .Values.dbHost }}
+              path: /version
+              port: {{ .Values.service.port }}
+              httpHeaders:
+              - name: Host
+			    velue: "35.193.195.224:1026" 
+              - name: User-Agent
+                value: "curl/7.52.1"
+              - name: Accept
+                value: "*/*"
+
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+			
+			readinessProbe:
+            exec:
+              command:
+                - mongo
+                - --ssl
+                - --sslCAFile=/data/configdb/tls.crt
+                - --sslPEMKeyFile=/work-dir/mongo.pem
+                - --eval
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+			
+            exec:
+              command:
+                - curl
+                - http://localhost:1026/version
+			
+# Readiness probe
+readinessProbe:
+  initialDelaySeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 3
+  periodSeconds: 30
+  successThreshold: 2
+
+# Liveness probe
+livenessProbe:
+  initialDelaySeconds: 50
+  timeoutSeconds: 10
+  failureThreshold: 3
+  periodSeconds: 30
+  successThreshold: 1
+  
+  kubectl exec orion-7b97dbfd76-l5zgs -- curl 35.202.30.169:1026/v2/entities/TightPants -s -S \
+	--header 'fiware-service: test' \
+    --header 'fiware-servicepath: /suit' \
+    --header 'Accept: application/json' -X DELETE
+
+#{{- define "password" -}}
+#{{- $password := .Values.mysqlha.mysqlRootPassword -}}
+#{{- printf $password -}}
+#{{- end -}}

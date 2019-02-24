@@ -1,0 +1,356 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: 2018-10-24T12:33:39Z
+  deletionGracePeriodSeconds: 30
+  deletionTimestamp: 2018-10-24T14:30:13Z
+  generateName: mysql-rs-mysqlha-
+  labels:
+    app: mysql-rs-mysqlha
+    controller-revision-hash: mysql-rs-mysqlha-6df4d786f
+    statefulset.kubernetes.io/pod-name: mysql-rs-mysqlha-0
+  name: mysql-rs-mysqlha-0
+  namespace: kubecity
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: StatefulSet
+    name: mysql-rs-mysqlha
+    uid: 0928e0a7-d789-11e8-ba00-42010a80017d
+  resourceVersion: "2246559"
+  selfLink: /api/v1/namespaces/kubecity/pods/mysql-rs-mysqlha-0
+  uid: 092f7388-d789-11e8-ba00-42010a80017d
+spec:
+  containers:
+  - env:
+    - name: MYSQL_DATABASE
+      value: dodoldb
+    - name: MYSQL_ROOT_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: mysql-root-password
+          name: mysql-rs-mysqlha
+    - name: MYSQL_REPLICATION_USER
+      value: repl
+    - name: MYSQL_REPLICATION_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: mysql-replication-password
+          name: mysql-rs-mysqlha
+    - name: MYSQL_USER
+      value: dodol
+    - name: MYSQL_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: mysql-password
+          name: mysql-rs-mysqlha
+    image: mysql:5.7.13
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      exec:
+        command:
+        - /bin/sh
+        - -c
+        - mysqladmin ping -h 127.0.0.1 -u root -p${MYSQL_ROOT_PASSWORD}
+      failureThreshold: 3
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    name: mysql
+    ports:
+    - containerPort: 3306
+      name: mysql
+      protocol: TCP
+    readinessProbe:
+      exec:
+        command:
+        - /bin/sh
+        - -c
+        - MYSQL_PWD="${MYSQL_ROOT_PASSWORD}"
+        - mysql -h 127.0.0.1 -u root -e "SELECT 1"
+      failureThreshold: 3
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/lib/mysql
+      name: data
+      subPath: mysql
+    - mountPath: /etc/mysql/conf.d
+      name: conf
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-token-k9qb8
+      readOnly: true
+  - args:
+    - -c
+    - |
+      set -ex
+
+      echo "Waiting for mysqld to be ready (accepting connections)"
+      until mysql -h 127.0.0.1 -e "SELECT 1"; do sleep 5; done
+
+      # Create replication user
+      cd /mnt/scripts
+      # file exists and is not empty with -s
+      if [[ -s create-replication-user.sh  ]]; then
+        ls -la
+        ./create-replication-user.sh
+      fi
+
+      cd /var/lib/mysql
+      # Determine binlog position of cloned data, if any.
+      if [[ -f xtrabackup_slave_info ]]; then
+        # XtraBackup already generated a partial "CHANGE MASTER TO" query
+        # because we're cloning from an existing slave.
+        cp xtrabackup_slave_info change_master_to.sql.in
+      elif [[ -f xtrabackup_binlog_info ]]; then
+        # We're cloning directly from master. Parse binlog position.
+        [[ $(cat xtrabackup_binlog_info) =~ ^(.*?)[[:space:]]+(.*?)$ ]] || exit 1
+        echo "CHANGE MASTER TO MASTER_LOG_FILE='${BASH_REMATCH[1]}',\
+              MASTER_LOG_POS=${BASH_REMATCH[2]}" > change_master_to.sql.in
+      fi
+
+      # Check if we need to complete a clone by starting replication.
+      if [[ -f change_master_to.sql.in ]]; then
+
+        # In case of container restart, attempt this at-most-once.
+        cp change_master_to.sql.in change_master_to.sql.orig
+        mysql -h 127.0.0.1 --verbose<<EOF
+        STOP SLAVE IO_THREAD;
+        $(<change_master_to.sql.orig),
+        MASTER_HOST='mysql-rs-mysqlha-0.mysql-rs-mysqlha',
+        MASER} --password=${MYSQL_REPLICATION_PASSWORD}"
+    command:
+    - /bin/bash
+    env:
+    - name: MYSQL_PWD
+      valueFrom:
+        secretKeyRef:
+          key: mysql-root-password
+          name: mysql-rs-mysqlha
+    - name: MYSQL_REPLICATION_USER
+      value: repl
+    - name: MYSQL_REPLICATION_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: mysql-replication-password
+          name: mysql-rs-mysqlha
+    image: gcr.io/google-samples/xtrabackup:1.0
+    imagePullPolicy: IfNotPresent
+    name: xtrabackup
+    ports:
+    - containerPort: 3307
+      name: xtrabackup
+      protocol: TCP
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/lib/mysql
+      name: data
+      subPath: mysql
+    - mountPath: /etc/mysql/conf.d
+      name: conf
+    - mountPath: /mnt/scripts
+      name: scripts
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-token-k9qb8
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  hostname: mysql-rs-mysqlha-0
+  initContainers:
+  - command:
+    - bash
+    - -c
+    - |
+      set -ex
+      # Skip the clone on master (ordinal index 0).
+      [[ `hostname` =~ -([0-9]+)$ ]] || exit 1
+      ordinal=${BASH_REMATCH[1]}
+      [[ $ordinal -eq 0 ]] && exit 0
+
+      # If data already exists, delete and proceed to clone.
+      [[ -d /var/lib/mysql/mysql ]] && rm -fr /var/lib/mysql/*
+
+      # Clone data from previous peer.
+      ncat --recv-only mysql-rs-mysqlha-$(($ordinal-1)).mysql-rs-mysqlha 3307 | xbstream -x -C /var/lib/mysql
+      # Prepare the backup.
+      xtrabackup --prepare --user=${MYSQL_REPLICATION_USER} --password=${MYSQL_REPLICATION_PASSWORD} --target-dir=/var/lib/mysql
+    env:
+    - name: MYSQL_REPLICATION_USER
+      value: repl
+    - name: MYSQL_REPLICATION_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: mysql-replication-password
+          name: mysql-rs-mysqlha
+    image: gcr.io/google-samples/xtrabackup:1.0
+    imagePullPolicy: IfNotPresent
+    name: clone-mysql
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/lib/mysql
+      name: data
+      subPath: mysql
+    - mountPath: /etc/mysql/conf.d
+      name: conf
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-token-k9qb8
+      readOnly: true
+  - args:
+    - -c
+    - |
+      set -ex
+      # Generate mysql server-id from pod ordinal index.
+      [[ `hostname` =~ -([0-9]+)$ ]] || exit 1
+      ordinal=${BASH_REMATCH[1]}
+      # Copy server-id.conf adding offset to avoid reserved server-id=0 value.
+      cat /mnt/config-map/server-id.cnf | sed s/@@SERVER_ID@@/$((100 + $ordinal))/g > /mnt/conf.d/server-id.cnf
+      # Copy appropriate conf.d files from config-map to config mount.
+      if [[ $ordinal -eq 0 ]]; then
+        cp -f /mnt/config-map/master.cnf /mnt/conf.d/
+      else
+        cp -f /mnt/config-map/slave.cnf /mnt/conf.d/
+      fi
+      # Copy replication user script
+      if [[ $ordinal -eq 0 ]]; then
+        cp -f /mnt/config-map/create-replication-user.sh /mnt/scripts/create-replication-user.sh
+        chmod 700 /mnt/scripts/create-replication-user.sh
+      fi
+    command:
+    - /bin/bash
+    image: mysql:5.7.13
+    imagePullPolicy: IfNotPresent
+    name: init-mysql
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /mnt/conf.d
+      name: conf
+    - mountPath: /mnt/config-map
+      name: config-map
+    - mountPath: /mnt/scripts
+      name: scripts
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-token-k9qb8
+      readOnly: true
+  nodeName: gke-kubecity-default-pool-04108545-grwj
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  subdomain: mysql-rs-mysqlha
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: data-mysql-rs-mysqlha-0
+  - emptyDir: {}
+    name: conf
+  - configMap:
+      defaultMode: 420
+      name: mysql-rs-mysqlha
+    name: config-map
+  - emptyDir: {}
+    name: scripts
+  - name: default-token-k9qb8
+    secret:
+      defaultMode: 420
+      secretName: default-token-k9qb8
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: 2018-10-24T12:33:50Z
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: 2018-10-24T12:34:27Z
+    message: 'containers with unready status: [mysql xtrabackup]'
+    reason: ContainersNotReady
+    status: "False"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: 2018-10-24T12:33:46Z
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://2d2c25a4a68c041bab73726c88283c8449df9b909324437688e2ed9f3d6858a6
+    image: mysql:5.7.13
+    imageID: docker-pullable://mysql@sha256:a9a5b559f8821fe73d58c3606c812d1c044868d42c63817fa5125fd9d8b7b539
+    lastState: {}
+    name: mysql
+    ready: false
+    restartCount: 0
+    state:
+      terminated:
+        exitCode: 0
+        finishedAt: null
+        startedAt: null
+  - containerID: docker://9b629e1b431bbb56528c2e5b85df2c3156d04cd35fb2f026875a67eeb4ac1d0d
+    image: gcr.io/google-samples/xtrabackup:1.0
+    imageID: docker-pullable://gcr.io/google-samples/xtrabackup@sha256:29354f70c9d9207e757a1bae6a4cbf2f57a56b18fe5c2b0acc1198a053b24b38
+    lastState:
+      terminated:
+        containerID: docker://9b629e1b431bbb56528c2e5b85df2c3156d04cd35fb2f026875a67eeb4ac1d0d
+        exitCode: 2
+        finishedAt: 2018-10-24T12:40:13Z
+        reason: Error
+        startedAt: 2018-10-24T12:40:13Z
+    name: xtrabackup
+    ready: false
+    restartCount: 6
+    state:
+      terminated:
+        exitCode: 0
+        finishedAt: null
+        startedAt: null
+  hostIP: 10.128.0.4
+  initContainerStatuses:
+  - containerID: docker://46e8d1d65273b664b0b9099ee5d5847865158379a3fe33478dbb1696c9433912
+    image: gcr.io/google-samples/xtrabackup:1.0
+    imageID: docker-pullable://gcr.io/google-samples/xtrabackup@sha256:29354f70c9d9207e757a1bae6a4cbf2f57a56b18fe5c2b0acc1198a053b24b38
+    lastState: {}
+    name: clone-mysql
+    ready: true
+    restartCount: 0
+    state:
+      terminated:
+        exitCode: 0
+        finishedAt: null
+        startedAt: null
+  - containerID: docker://b5dc370e4a8f1477a336cd11de0658328cd05743c03b1c5dfbf7714f3eb6565c
+    image: mysql:5.7.13
+    imageID: docker-pullable://mysql@sha256:a9a5b559f8821fe73d58c3606c812d1c044868d42c63817fa5125fd9d8b7b539
+    lastState: {}
+    name: init-mysql
+    ready: true
+    restartCount: 0
+    state:
+      terminated:
+        exitCode: 0
+        finishedAt: null
+        startedAt: null
+  phase: Running
+  podIP: 10.36.0.66
+  qosClass: BestEffort
+  startTime: 2018-10-24T12:33:46Z

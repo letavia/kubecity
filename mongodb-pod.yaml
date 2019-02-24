@@ -1,0 +1,28 @@
+apiVersion: v1 #for versions before 1.9.0 use apps/v1beta2
+kind: Pod
+metadata:
+  name: mongodb-pod
+  labels:
+    app: orion
+    tier: mongodb
+spec:
+  containers:     
+      - image: mongo:3.4
+        name: mongodb-deploy
+        env:
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: password
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: admin 
+        ports:
+        - containerPort: 27017
+          name: mongodb
+        volumeMounts:
+        - name: mongodb-persistent-storage
+          mountPath: /data/db
+        #args: ["--auth","--dbpath","/data/db"]
+        #command: ["mongod","--setParameter","authenticationMechanisms=SCRAM-SHA-1"]  
+        #args: ["--nojournal"]
+  volumes:
+  - name: mongodb-persistent-storage
+    emptyDir: {}

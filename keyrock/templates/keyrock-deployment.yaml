@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "keyrock.fullname" . }}
+  labels:
+    app: {{ include "keyrock.name" . }}
+    chart: {{ include "keyrock.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- if .Values.extraLabels }}  
+    {{ include "keyrock.extraLabels" . }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "keyrock.name" . }}
+      release: {{ .Release.Name }}
+      {{- if .Values.extraLabels }}
+      {{ include "keyrock.extraLabels" . }}
+      {{- end }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "keyrock.name" . }}
+        release: {{ .Release.Name }}
+        {{- if .Values.extraLabels }}
+        {{ include "keyrock.extraLabels" . }}
+        {{- end }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.ports.http }}
+            - containerPort: {{ .Values.ports.https }}
+          env:
+          - name: DATABASE_HOST
+            value: {{ .Values.database.host }}
+          - name: IDM_DB_PASS 
+            value: {{ .Values.database.password }}
+          #- name: IDM_DB_USER
+          #  value: {{ .Values.database.user }}
+          - name: IDM_DB_NAME
+            value: {{ .Values.database.name }}
+          #- name: IDM_DB_PORT
+          #  value: {{ .Values.database.port }}
+          - name: IDM_HOST
+            value: {{ .Values.portal.host }} 
+          #- name: IDM_PORT
+          #  value: {{ .Values.portal.port }}
+          #- name: IDM_HTTPS_ENABLED
+          #  value: {{ .Values.portal.httpsEnabled }}
+          #- name: IDM_HTTPS_PORT
+          #  value: {{ .Values.portal.httpsPort }}
+          - name: IDM_ADMIN_ID
+            value: {{ .Values.portal.adminID }}
+          - name: IDM_ADMIN_USER
+            value: {{ .Values.portal.adminUser }}
+          - name: IDM_ADMIN_EMAIL
+            value: {{ .Values.portal.adminEmail }}
+          - name: IDM_ADMIN_PASS
+            value: {{ .Values.portal.adminPassword }}
+          - name: IDM_AUTHZFORCE_ENABLED
+            value: {{ quote .Values.authzforce.enabled }}
+          - name: IDM_AUTHZFORCE_HOST
+            value: {{ .Values.authzforce.host }}
+          - name: IDM_AUTHZFORCE_PORT
+            value: {{ quote .Values.authzforce.port }}
+          - name: IDM_PDP_LEVEL
+            value: {{ .Values.pdpLevel }}
+          - name: IDM_SESSION_SECRET
+            value: {{ .Values.sessionSecret }}
+          - name: IDM_ENCRYPTION_KEY
+            value: {{ .Values.encryptionKey }}
+          #- name: IDM_DIALECT
+          #  value: {{ .Values.dialect }}
+          #- name: IDM_EMAIL_HOST
+          #  value: {{ .Values.email.host }}
+          #- name: IDM_EMAIL_PORT
+          #  value: {{ .Values.email.port }}
+          #- name: IDM_EMAIL_ADDRESS
+          #  value: {{ .Values.email.address }}
+          #- name: IDM_EX_AUTH_ENABLED
+          #  value: {{ .Values.external.enabled }}
+          #- name: IDM_EX_AUTH_DB_USER
+          #  value: {{ .Values.external.user }}
+          #- name: IDM_EX_AUTH_DB_PASS
+          #  value: {{ .Values.external.password }}
+          #- name: IDM_EX_AUTH_DRIVER
+          #  value: {{ .Values.external.driver }}
+          #- name: IDM_EX_AUTH_DB_HOST
+          #  value: {{ .Values.external.dbHost }}
+          #- name: IDM_EX_AUTH_DB_NAME
+          #  value: {{ .Values.external.dbName }}
+          #- name: IDM_EX_AUTH_DB_USER_TABLE
+          #  value: {{ .Values.external.dbUserTable }}
+          #- name: IDM_EX_AUTH_DIALECT
+          #  value: {{ .Values.external.dialect }}               
+          readinessProbe:
+            exec:
+              command:
+                - curl
+                - http://localhost:3000
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - http://localhost:3000
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+ 
+
+

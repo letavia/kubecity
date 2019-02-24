@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wilma.fullname" . }}
+  labels:
+    app: {{ include "wilma.name" . }}
+    chart: {{ include "wilma.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "wilma.name" . }}
+      release: {{ .Release.Name }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 6 }}
+{{- end }}   
+  template:
+    metadata:
+      labels:
+        app: {{ include "wilma.name" . }}
+        release: {{ .Release.Name }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 8 }}
+{{- end }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.ports.containerPort }} 
+          env:
+          - name: PEP_PROXY_PORT
+            value: {{ quote .Values.proxy.port }} 
+          - name: PEP_PROXY_IDM_HOST
+            value: {{ .Values.idm.host }} 
+          - name: PEP_PROXY_IDM_PORT
+            value: {{ quote .Values.idm.port }} 
+          - name: PEP_PROXY_HTTPS_ENABLED
+            value: {{ quote .Values.proxy.https.enabled }} 
+          - name: PEP_PROXY_HTTPS_PORT
+            value: {{ quote .Values.proxy.https.port }} 
+          - name: PEP_PROXY_IDM_SSL_ENABLED
+            value: {{ quote .Values.idm.ssl.enabled }} 
+          - name: PEP_PROXY_APP_HOST
+            value: {{ .Values.proxy.app.host }} 
+          - name: PEP_PROXY_APP_PORT
+            value: {{ quote .Values.proxy.app.port }} 
+          - name: PEP_PROXY_APP_SSL_ENABLED
+            value: {{ quote .Values.proxy.app.ssl.enabled }} 
+          - name: PEP_PROXY_AUTH_ENABLED
+            value: {{ quote .Values.auth.enabled }} 
+          - name: PEP_PROXY_APP_ID
+            value: {{ .Values.proxy.app.id }} 
+          - name: PEP_PROXY_USERNAME
+            value: {{ .Values.proxy.app.username }} 
+          - name: PEP_PASSWORD
+            value: {{ .Values.proxy.app.password }}
+          - name: PEP_PROXY_PDP
+            value: {{ .Values.proxy.pdp }} 
+          - name: PEP_PROXY_AZF_PROTOCOL
+            value: {{ .Values.azf.protocol }} 
+          - name: PEP_PROXY_AZF_HOST
+            value: {{ .Values.azf.host }}  
+          - name: PEP_PROXY_AZF_PORT
+            value: {{ quote .Values.azf.port }} 
+          #- name: PEP_PROXY_AZF_CUSTOM_POLICY
+          #  value: {{ .Values.azf.customPolicy }} 
+          - name: PEP_PROXY_MAGIC_KEY
+            value: {{ .Values.proxy.magicKey }} 
+          #- name: PEP_TOKEN_SECRET #not needed even with jwt enabled    
+          #  value: {{ .Values.token.secret }}
+          readinessProbe:
+            exec:
+              command:
+                - curl
+                - http://localhost:1027
+                - -H
+                - "X-Auth-Token: {{ .Values.proxy.magicKey }}"
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - http://localhost:1027
+                - -H
+                - "X-Auth-Token: {{ .Values.proxy.magicKey }}"
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}

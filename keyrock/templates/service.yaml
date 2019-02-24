@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "keyrock.fullname" . }}
+  labels:
+    app: {{ include "keyrock.name" . }}
+    chart: {{ include "keyrock.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- if .Values.extraLabels }}
+    {{ include "keyrock.extraLabels" . }}
+    {{- end }}    
+spec:
+  type: {{ .Values.service.type }}
+  ports: 
+  - name: {{ .Values.service.ports.idmHttp.name }}
+    port: {{ .Values.service.ports.idmHttp.port }}
+    targetPort: {{ .Values.service.ports.idmHttp.targetPort }}
+  - name: {{ .Values.service.ports.idmHttps.name }}
+    port: {{ .Values.service.ports.idmHttps.port }}
+    targetPort: {{ .Values.service.ports.idmHttps.targetPort }}
+  - name: {{ .Values.service.ports.authTokenExt.name }}
+    port: {{ .Values.service.ports.authTokenExt.port }}
+    targetPort: {{ .Values.service.ports.authTokenExt.targetPort }}
+  - name: {{ .Values.service.ports.authTokenInt.name }}
+    port: {{ .Values.service.ports.authTokenInt.port }}
+    targetPort: {{ .Values.service.ports.authTokenInt.targetPort }}
+  selector:
+    app: {{ include "keyrock.name" . }}
+    release: {{ .Release.Name }}
+    {{- if .Values.extraLabels }}
+    {{ include "keyrock.extraLabels" . }} 
+    {{- end }}

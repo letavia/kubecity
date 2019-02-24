@@ -1,0 +1,130 @@
+# Default values for keyrock.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+image:
+  repository: fiware/idm
+  tag: latest
+  pullPolicy: IfNotPresent
+
+nameOverride: "keyrock"
+fullnameOverride: "keyrock-idm"
+
+extraLabels:
+  tier: idm
+
+service:
+  type: LoadBalancer
+  ports:
+    idmHttp:
+      name: idm-http
+      port: 3000
+      targetPort: 3000
+    idmHttps:
+      name: idm-https
+      port: 443
+      targetPort: 443
+    authTokenExt:
+      name: auth-token-ext
+      port: 8000
+      targetPort: 8000
+    authTokenInt:
+      name: auth-token-int
+      port: 5000
+      targetPort: 5000
+      
+ports:
+  http: 3000
+  https: 443 
+
+database:
+  host: mysql-rs-mysql
+  #port: 3306
+  name: keyrock
+  #user: root
+  password: mysql
+
+portal:
+  host: http://keyrock-idm:3000
+  #port: 3000
+  #httpsEnabled: false
+  #httpsPort: 443
+  adminID: quimin
+  adminUser: quints
+  adminEmail: quints@quints.com
+  adminPassword: quints
+
+authzforce:
+  enabled: true
+  host: authzforce
+  port: 8080
+    
+pdpLevel: advanced
+
+sessionSecret: quints
+encryptionKey: quints
+#dialect: mysql
+
+email: {}
+  #host: localhost
+  #port: 25
+  #address: noreply@localhost
+
+external: {}
+  #enabled: false
+  #user: db_user
+  #password: db_pass
+  #driver: custom_authentication_driver
+  #dbHost: localhost
+  #dbName: db_name
+  #dbUserTable: user
+  #dialect: mysql
+  
+ingress: {}
+  #enabled: false
+  #annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  #path: /
+  #hosts:
+    #- chart-example.local
+  #tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Readiness probe
+readinessProbe:
+  initialDelaySeconds: 5
+  timeoutSeconds: 1
+  failureThreshold: 3
+  periodSeconds: 10
+  successThreshold: 1
+
+# Liveness probe
+livenessProbe:
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+  periodSeconds: 10
+  successThreshold: 1

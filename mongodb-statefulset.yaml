@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  labels:
+    app: orion
+    tier: mongodb
+spec:
+  #type: LoadBalancer
+  ports:
+    - port: 27017
+  selector:
+    app: orion
+    tier: mongodb
+  clusterIP: None
+---
+
+apiVersion: apps/v1 #for versions before 1.9.0 use apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: mongodb
+  labels:
+    app: orion
+    tier: mongodb
+spec:
+  serviceName: "mongodb"
+  replicas: 3
+  updateStrategy:  #default
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: orion
+      tier: mongodb
+  template:
+    metadata:
+      labels:
+        app: orion
+        tier: mongodb
+    spec:
+      containers:
+      - image: mongo:4.0
+        name: mongodb
+        env:
+        - name: VERSION
+          value: V1
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: password
+        ports:
+        - containerPort: 27017
+          name: mongodb
+        volumeMounts:
+        - name: pvc
+          mountPath: /data/db
+          subPath: db
+        - name: pvc
+          mountPath: /data/configdb
+          subPath: configdb
+        command:
+            - "mongod"
+            - "--bind_ip"
+            - "0.0.0.0"
+            - "--replSet"
+            - "MainRepSet"  
+            - "--auth"
+            #- "--setParameter"
+            #- "authenticationMechanisms=SCRAM-SHA-1"
+            
+        #command: ["mongod","--setParameter","authenticationMechanisms=SCRAM-SHA-1"] 
+        #args: ["--nojournal"]
+        
+  volumeClaimTemplates:
+  - metadata:
+      name: pvc
+    spec:
+      accessModes: ["ReadWriteMany"]
+      storageClassName: glusterfs-sc
+      resources:
+        requests:
+          storage: 1Gi

@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  kube: test
+kind: ConfigMap
+metadata:
+  creationTimestamp: 2018-09-10T17:29:04Z
+  name: config
+  namespace: kubetest
+  resourceVersion: "123532"
+  selfLink: /api/v1/namespaces/kubetest/configmaps/config
+  uid: 03ce09b5-b51f-11e8-963e-42010a800fcf

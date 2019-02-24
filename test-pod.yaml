@@ -1,0 +1,35 @@
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: test-pod
+     labels:
+       app: busy
+   spec:
+     replicas: 1
+     selector:
+      matchLabels:
+       app: busy
+       #level: test
+     template:
+       metadata:
+        labels:
+          app: busy
+          #level: test
+       spec:
+         containers:
+         - name: test-container
+           image: busybox
+           command: [ "/bin/sh" ]
+           args: #[ "-c", "sleep 100" ]
+            valueFrom:
+            - configMapRef:
+                name: commandconf
+           #args:
+           #- echo starting
+           #- ls -la
+           #- echo done
+           #envFrom:
+           #- configMapRef:
+           #    name: commandconf
+
+         #restartPolicy: Never

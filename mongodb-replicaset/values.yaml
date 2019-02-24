@@ -1,0 +1,130 @@
+
+replicas: 3
+port: 27017
+
+replicaSetName: kubecity-rs
+nameOverride: mongodb-rs
+fullnameOverride: mongodb-rs-kubecity
+
+podDisruptionBudget: {} 
+  #maxUnavailable: 1
+  #minAvailable: 2
+
+auth:
+  enabled: true
+  adminUser: root
+  adminPassword: mongodb
+  metricsUser: mongo
+  metricsPassword: metrics
+  key: mongokey
+  #existingKeySecret: mongodb-key-file
+  #existingAdminSecret: mongodb-secret
+  #exisitingMetricsSecret:
+
+# Specs for the Docker image for the init container that establishes the replica set
+installImage:
+  repository: k8s.gcr.io/mongodb-install
+  tag: 0.6
+  pullPolicy: IfNotPresent
+
+# Specs for the MongoDB image
+image:
+  repository: mongo
+  tag: 3.6
+  pullPolicy: IfNotPresent
+
+# Additional environment variables to be set in the container
+extraVars: {}
+# - name: TCMALLOC_AGGRESSIVE_DECOMMIT
+#   value: "true"
+
+# Prometheus Metrics Exporter
+metrics:
+  enabled: true
+  image:
+    repository: ssalaues/mongodb-exporter
+    tag: 0.6.1
+    pullPolicy: IfNotPresent
+  port: 9216
+  path: "/metrics"
+  socketTimeout: 3s
+  syncTimeout: 1m
+  prometheusServiceDiscovery: true
+  #resources: {}
+
+# Annotations to be added to MongoDB pods
+podAnnotations: {}
+  #version: 1
+  
+securityContext:
+  runAsUser: 999
+  fsGroup: 999
+  runAsNonRoot: false
+
+resources: {}
+  #limits:
+    #cpu: 500m
+    #memory: 512Mi
+  #requests:
+    #cpu: 100m
+    #memory: 256Mi
+
+## Node selector
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+nodeSelector: {}
+
+affinity: {}
+
+tolerations: []
+
+extraLabels: {}
+  #app: orion
+  #tier: database     
+   
+persistentVolume:
+  enabled: true
+  ## mongodb-replicaset data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+  accessModes:
+    - ReadWriteMany
+  size: 1Gi
+  annotations: {}
+
+# Annotations to be added to the service
+serviceAnnotations: {}
+
+tls:
+  # Enable or disable MongoDB TLS support
+  enabled: false
+  # Please generate your own TLS CA by generating it via:
+  # $ openssl genrsa -out ca.key 2048
+  # $ openssl req -x509 -new -nodes -key ca.key -days 10000 -out ca.crt -subj "/CN=mydomain.com"
+  # After that you can base64 encode it and paste it here:
+  # $ cat ca.key | base64 -w0
+  cacert: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURBVENDQWVtZ0F3SUJBZ0lKQU5ZQ3Fpc1owL1J1TUEwR0NTcUdTSWIzRFFFQkN3VUFNQmN4RlRBVEJnTlYKQkFNTURHdDFZbVZqYVhSNUxtTnZiVEFlRncweE9ERXdNVFF4TWpJMU5EVmFGdzAwTmpBek1ERXhNakkxTkRWYQpNQmN4RlRBVEJnTlZCQU1NREd0MVltVmphWFI1TG1OdmJUQ0NBU0l3RFFZSktvWklodmNOQVFFQkJRQURnZ0VQCkFEQ0NBUW9DZ2dFQkFLT2JuZ21WbkpteTZYYUZMdUI3R2laUmw3SEVTaXFnMkFPOWR4Mjg4bzc1SitKem9IOHUKNjZzcWxLMzZLOUszKzZ5RVR1WVIyTkJScUJCbUNNaS9GNEdPUkhpVlZNVUhqNFdpUUJSWm5DYmlsYjZPemV2RgpnZHpTTFRwYUFob0ttN3NZZldqcjZySnlMdmdnOVllNGlWL2FtUWlWMDh4M2VzemFsOUZwWGIzdkFWSm1ZbWdTCnYreXVBaStNM1VDNEdWV1V1RFZrQThtb1F5TzVvVk1mQm9ORnM4T3MrejRORmN3R2pBZXlpVTFtczEzZ3JZZE8KMTh6bVhWWnY1L01jUUZ4M1BROGpBUTNVU3htRk92M0JDRC9xNjBvUUpGbUYzbzB3UlU2ZVNETUxCamZpU3IycAp0ZEY3QmNFbG1EY1YyaUNoZzRLVjBhZkhEZkMzTU9La0tOVUNBd0VBQWFOUU1FNHdIUVlEVlIwT0JCWUVGRjdCCmttdWlkb2JHLzE1QnFrSTh5YWdrMzBid01COEdBMVVkSXdRWU1CYUFGRjdCa211aWRvYkcvMTVCcWtJOHlhZ2sKMzBid01Bd0dBMVVkRXdRRk1BTUJBZjh3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUVyZ0RRNGIwTDdOcFZoagpLT1IwakFsMldKa1NKT3dZMFl2Uml1Z1RMSkZYeFJtU1ZVelFCYXV5czNtSFA4eGY3ZU5hczdlcWNENWhyYmY1Ck9FMnJXUGtRYkJPNlhXb0s3S1RaTW5MRUpGVDR3MTJXM3BGVkcyMXBzTVN6VkcvejdWc3lnS09tbE9KUnRFU2kKaWRHaGpNWnIybWVac3k1a3YvT3pYWmVjSFV2VjlYd09iMFcwT3I3WHJISi9kSFdhS0pCR1B6TGtjVzZLeGhQMgpKSEZuYkFvYndWK1dsd0VIazFFemRrSThjSys2aVhrbXdMYVI3WGU1enpjdnNhYTJpa2VOQnBPdEVXcGpWRlR0CnVwQytTRVYxOHpuZlFWcmp2ZGo1YnRwbGZYbG5zdWRYSlhRY3E3Ykg5OXpQZnY5R3UyWU9NS3RXYThqK2tkeisKeWg4WkZqND0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+  cakey: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb2dJQkFBS0NBUUVBbzV1ZUNaV2NtYkxwZG9VdTRIc2FKbEdYc2NSS0txRFlBNzEzSGJ6eWp2a240bk9nCmZ5N3JxeXFVcmZvcjByZjdySVJPNWhIWTBGR29FR1lJeUw4WGdZNUVlSlZVeFFlUGhhSkFGRm1jSnVLVnZvN04KNjhXQjNOSXRPbG9DR2dxYnV4aDlhT3Zxc25JdStDRDFoN2lKWDlxWkNKWFR6SGQ2ek5xWDBXbGR2ZThCVW1aaQphQksvN0s0Q0w0emRRTGdaVlpTNE5XUUR5YWhESTdtaFV4OEdnMFd6dzZ6N1BnMFZ6QWFNQjdLSlRXYXpYZUN0CmgwN1h6T1pkVm0vbjh4eEFYSGM5RHlNQkRkUkxHWVU2L2NFSVArcnJTaEFrV1lYZWpUQkZUcDVJTXdzR04rSksKdmFtMTBYc0Z3U1dZTnhYYUlLR0RncFhScDhjTjhMY3c0cVFvMVFJREFRQUJBb0lCQUN5OFlIbyticE9ZV0Q0UQpMTUUwNS9HU1hlZzl4QW5qOFMwVW9YMkFMTkxyVGZ5ZG9VVWxqMHMrV1drNC9zS2ZqREdmKy9Mczdsd0g5K3lECitlTHFYWU1QWTZtVks1aTBlSW9SMDNPOURQV1UvMTBicnpMSXpybVN2c3MxMFYxTmlVZWZhcXRGMXViMFVlT0gKSDV2ODJaTmNNbndtZThOczZDY2JubWVrWi8yRzdMdE9JNUw3emxsWE45TDhhOFU5aFNpVjFyOUtyS2JJSUNjdQpvcUZ4elgrRXhNQnE4UFlyTFViODVTTzlXdWI1QkwrMWwwczl3Ti9xcFVES2NlKysySzIzOExjWGp6WTBMbCtPCi9CcnM4K3E0VUkxdFZhNWptZjVNWGovK1YyNjMzQ0lwam93OWZ5OE9VNzhmMEg5NXB3RC9zZU1RZ0hwQjFEbWQKZUkvZGlBRUNnWUVBMktyUXhZR0QwaW8rNTlmYnBOOHE1ZG4wMVppZStjdld3VTNSMDRnTkpXMEdhV3kyNTg4RwpxU1FlNTliSnFHOWpGQWNCMHZRWHN5WUc5YWhpMkt1NXZnaG5ybnJ1eE5SR09FejdWaERrc1RQUGV4TnlvUDFYCjJ2L0xSWHRKeTIwTk1xbWo0VlZiOWhUVVFmQXBBZUlsWnlNdmhKVE1VbTl3cHJlQTNvNDJ3bzhDZ1lFQXdVNzQKMURMbzk0TzUxRUVBeCtaeWljdXlMakk4THNWTEFoTHpqS1kwM2FPelYvclo4U0hTdDlNd0oySEp6K1FoSzFRMQpZZUNoQnZpSlkyYjRPSUV6d3BzalBJa2RTYjRUODI1bnE2UUxxN3pZdzFUUklEaWVXZXpZdEsxdmxOQytsZTAvCmkyRzdUTkNTbkU5VjlzeVEwRkxWMXg0MXlnbXREYkJHRDlxREFGc0NnWUFnS0dJcUhrbnhaSUhIcVZzWlFtSTgKa1Rmc2grVjRqOCtGQzBiTVRaSWQ3dXVYdENJRmo4MmVSeFVyTmM3aVovM2RtQmltTmNKYXZaY2syT1FxNG5vRQpBWDFhQVRiMUVjaUdUSzYxSEhiRThqcW1Pc0cxc1VSYjVjRkd3OEMxSjY5Z3lKcmhNK2tkUWdRcThUazA1VnJGCnp3d2JjblpNK2V0UFkwY0dRVGRSY3dLQmdDVFI2UDFxTVF1c01JSW9XNEMzK1VzYjNIV0dKZ1oybCtIdVFDdWoKSU9DeXBKOTJiWHJMaVhwd0pIVHI0R2ZUdVNtcW9YeGlMK25HLzB4S3VhN3hsUzFWSlhJTFgrUEM2OFByWEozSgo0bHMwM2tqZVovTHVOZU5GQk1YdFh4cUdaRGJrZUwwUXdYOVJId3ZjNUsvY3FSeTFHbndlQ2ZyUXV3Q25lY0RkClN5U1BBb0dBWENWTGREMEIzZGNVT050WEVTcmgxd1dsK2dtTmErbW9sRGEybVdZMUZ2MmtOQmRiOWhLckJKc0oKSlVleHVWemNuOXNiYmNtOHZoTWViNElyT3p1V1d4c1FmdlcvMVFidS9odUZodEMwZDMzejZBeG9IQkNYWHZmLwp3R0Vza1g2VlM0ekljc01tQVJaZDRoVTRZM2MzdnlaK1R4K0owSGlzUENCWmZHYjVsK1E9Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+
+# Entries for the MongoDB config file
+configmap:
+
+# Readiness probe
+readinessProbe:
+  initialDelaySeconds: 5
+  timeoutSeconds: 1
+  failureThreshold: 3
+  periodSeconds: 10
+  successThreshold: 1
+
+# Liveness probe
+livenessProbe:
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+  periodSeconds: 10
+  successThreshold: 1

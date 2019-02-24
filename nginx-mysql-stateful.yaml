@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-mysql
+  labels:
+    app: nginx-mysql
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    app: nginx-mysql
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nginx-mysql-stateful
+spec:
+  serviceName: "nginx-mysql"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-mysql
+  template:
+    metadata:
+      labels:
+        app: nginx-mysql
+    spec:
+      containers:
+      - name: nginx
+        image: k8s.gcr.io/nginx-slim:0.8
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: www
+          mountPath: /usr/share/nginx/html
+      - name: mysql
+        image: mysql/mysql-server:5.7.21
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: www
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: idm    
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: ["ReadWriteMany"]
+      storageClassName: glusterfs-sc
+      resources:
+        requests:
+          storage: 1Gi

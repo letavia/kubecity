@@ -1,0 +1,32 @@
+ apiVersion: extensions/v1beta1
+ kind: Deployment
+ metadata: 
+   name: fiware-idm-k8s
+ spec: 
+ replicas: 2
+ selector:
+   matchLabels: 
+     app: fiware-idm   
+ services:
+   mysql:
+     image: mysql/mysql-server:5.7.21
+     ports:
+       - "3306:3306"
+     networks:
+       idm_network:
+         ipv4_address: 172.18.1.5
+     volumes:
+       - vol-mysql:/var/lib/mysql
+     environment:
+       - MYSQL_ROOT_PASSWORD=idm
+       - MYSQL_ROOT_HOST=172.18.1.6
+   fiware-idm:
+     image: fiware/idm
+     ports:
+       - "3000:3000"
+       - "443:443"
+     networks:
+       idm_network:
+         ipv4_address: 172.18.1.6
+     environment:
+       - DATABASE_HOST=mysql

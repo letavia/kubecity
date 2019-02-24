@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: iot-sensors
+  labels: 
+    app: iot-sensors
+    tier: iotagent-ul
+spec:
+  type: LoadBalancer
+  ports:
+  - name: app
+    port: 3000
+    targetPort: 3000
+  - name: admin
+    port: 3001
+    targetPort: 3001
+  selector:
+    app: iot-sensors
+    tier: iotagent-ul
+  
+---
+ 
+ apiVersion: extensions/v1beta1
+ kind: Deployment
+ metadata:
+   name: iot-sensors
+   labels:
+     app: iot-sensors
+     tier: iotagent-ul
+ spec:
+   replicas: 1
+   selector:
+    matchLabels:
+      app: iot-sensors
+      tier: iotagent-ul
+   template:
+     metadata:
+       labels:
+         app: iot-sensors
+         tier: iotagent-ul
+     spec:
+       containers:
+       - name: iot-sensors
+         image: fiware/tutorials.context-provider
+         ports:
+         - containerPort: 3000
+         - containerPort: 3001
+         env:
+         - name: DEBUG
+           value: tutorial:*
+         - name: WEB_APP_PORT
+           value: "3000" 
+         - name: IOTA_HTTP_HOST
+           value: iotagent-ul 
+         - name: IOTA_HTTP_PORT
+           value: "7896" 
+         - name: DUMMY_DEVICES_PORT
+           value: "3001" # Port used by the dummy IOT devices to receive commands
+         - name: DUMMY_DEVICES_TRANSPORT
+           value: HTTP # Default transport used by dummy Io devices
+         - name: DUMMY_DEVICES_API_KEY
+           value: dodol23 # API key used by the dummy IOT devices 
+         - name: CONTEXT_BROKER
+           value: http://orion:1026/v2
+        #- "OPENWEATHERMAP_KEY_ID=<ADD_YOUR_KEY_ID>"
+        #- "TWITTER_CONSUMER_KEY=<ADD_YOUR_CONSUMER_KEY>"
+        #- "TWITTER_CONSUMER_SECRET=<ADD_YOUR_CONSUMER_SECRET>"
