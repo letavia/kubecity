@@ -9,8 +9,8 @@ image:
   tag: latest-rev
   pullPolicy: Always
 
-nameOverride: ""
-fullnameOverride: "iotagent"
+nameOverride: iotaul
+fullnameOverride: iotagent-ul
 
 extraLabels:
   tier: iot
@@ -33,8 +33,9 @@ ports:
 
 #context-broker
 contextBroker:
-  host: orion-cb
-  port: 1026
+  host: wilma-idm #host and port used only if not defined in service provisioning 
+  port: 80
+  ngsiVersion: v2
   
 database:
   host: mongodb-rs-kubecity
@@ -51,21 +52,42 @@ agent:
   logLevel: DEBUG
   timestamp: true
   httpPort: 7896
-  providerURL: "http://iotagent:4041"
+  providerURL: "http://iotagent-ul:4041"
   adminUser: root
   adminPassword: mongodb
   
 auth:
   enabled: true
-  type: password
-  header: x-auth-token
+  type: oauth2
+  header: Authorization
   host: keyrock-idm
   port: 3000
-  user: quints@quints.com
-  password: quints
-  permanent_token: 3fb3d7bb48a4fa145f783511ca4662375ff8d2e8
+  clientId: 63611f59-af90-4bf1-9b8f-d17daccbc79e 
+  clientSecret: 9a698476-f23c-4f81-83fd-7e83b2e3b8bb
+  permanentToken: true
+  tokenPath: /oauth2/token
+
+mqtt:
+  host: mosquitto
+  port: 1883
+  #username:    #only if mqtt authentication is enabled
+  #password:    #only if mqtt authentication is enabled
+  qos: 2
+  retain: true
+
+amqp:
+  host: rabbitmq
+  port: 5672
+  username: rabbitmq
+  password: rabbitmq
+  exchange: amq.topic 
+  queue: iotaul
+  durable: true 
+  retries: 5  
+  retry: 5  
+  #vhost: /
   
-  
+autocast: true 
   
 ingress:
   enabled: false
@@ -97,3 +119,19 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# Readiness probe
+readinessProbe:
+  initialDelaySeconds: 20
+  timeoutSeconds: 3
+  failureThreshold: 3
+  periodSeconds: 30
+  successThreshold: 2
+
+# Liveness probe
+livenessProbe:
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+  periodSeconds: 30
+  successThreshold: 1

@@ -6,10 +6,10 @@
           "node": {
             "hostnames": {
               "manage": [
-                "gke-kubecity-default-pool-e38ceae0-865s"
+                "gke-kubecity-kube-pool-be02f16f-7lq5"
               ],
               "storage": [
-                "10.128.0.4"
+                "10.128.0.54"
               ]
             },
             "zone": 1
@@ -22,10 +22,10 @@
           "node": {
             "hostnames": {
               "manage": [
-                "gke-kubecity-default-pool-e38ceae0-xpk4"
+                "gke-kubecity-kube-pool-be02f16f-ql2d"
               ],
               "storage": [
-                "10.128.0.2"
+                "10.128.0.53"
               ]
             },
             "zone": 1
@@ -38,10 +38,10 @@
           "node": {
             "hostnames": {
               "manage": [
-                "gke-kubecity-default-pool-e38ceae0-z3d4"
+                "gke-kubecity-kube-pool-be02f16f-sr6f"
               ],
               "storage": [
-                "10.128.0.3"
+                "10.128.0.55"
               ]
             },
             "zone": 1

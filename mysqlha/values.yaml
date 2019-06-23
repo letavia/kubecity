@@ -4,8 +4,8 @@
 mysqlImage: mysql:5.7.13
 xtraBackupImage: gcr.io/google-samples/xtrabackup:1.0
 
-nameOverride: "mysql"
-fullnameOverride: "mysql-rs"
+nameOverride: mysql
+fullnameOverride: mysql-rs
 
 mysqlha:
   replicaCount: 2

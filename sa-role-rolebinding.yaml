@@ -11,7 +11,7 @@ metadata:
   name: kubecity-admin-role
   namespace: kubecity
 rules:
-- apiGroups: ["", "extensions", "apps","rbac.authorization.k8s.io","kubernetes.io","horizontalpodautoscalers"]
+- apiGroups: ["", "extensions", "apps","rbac.authorization.k8s.io","kubernetes.io","horizontalpodautoscalers","networkpolicies.networking.k8s.io"]
   resources: ["*"]
   verbs: ["*"]
 - apiGroups: ["batch"]
@@ -31,6 +31,6 @@ subjects:
   name: kubecity-sa
   namespace: kubecity
 roleRef:
-  apiGroup: rbac.authorization.k8s.io
+  apiGroup: ""
   kind: Role
   name: kubecity-admin-role

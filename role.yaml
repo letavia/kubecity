@@ -1,10 +1,10 @@
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  name: kubetest-user-full-access
-  namespace: kubetest
+  name: kubecity-admin-role
+  namespace: kubecity
 rules:
-- apiGroups: ["", "extensions", "apps"]
+- apiGroups: ["", "extensions", "apps","rbac.authorization.k8s.io","kubernetes.io","horizontalpodautoscalers","networkpolicies.networking.k8s.io"]
   resources: ["*"]
   verbs: ["*"]
 - apiGroups: ["batch"]
@@ -12,4 +12,3 @@ rules:
   - jobs
   - cronjobs
   verbs: ["*"]
-  

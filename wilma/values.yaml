@@ -9,8 +9,8 @@ image:
   tag: 7.5.1
   pullPolicy: IfNotPresent
 
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: wilma
+fullnameOverride: wilma-idm
 
 extraLabels:
   tier: idm
@@ -29,18 +29,18 @@ proxy:
     enabled: false 
     port: 443 
   app:
-    id: a99d9c0f-cce7-4717-b0c0-48b740002cfd
-    username: pep_proxy_66cdb599-d3c3-40db-a6bb-1804786851aa
-    password: pep_proxy_97bff1b1-5f15-4c90-9ef7-4e4cf8701112
+    id: 63611f59-af90-4bf1-9b8f-d17daccbc79e
+    username: pep_proxy_37abdba9-9424-4a88-9606-ab7ed8bb0c48
+    password: pep_proxy_a93acba8-ec83-4bcd-8ad7-782ca86d9e59
     host: orion-cb
     port: 1026
     ssl: 
       enabled: false 
-  pdp: authzforce 
+  pdp: authzforce-idm 
   magicKey: kamvret
     
 auth:
-  enabled: true 
+  enabled: false #checking for authorization
   
 idm:
   port: 3000 
@@ -50,13 +50,14 @@ idm:
     
 azf:
   protocol: http 
-  host: authzforce 
+  host: authzforce-idm 
   port: 8080 
   #customPolicy: undefined #default
   
 token: {}
   #secret: 
-  
+
+# Readiness probe  
 readinessProbe:
   initialDelaySeconds: 5
   timeoutSeconds: 1

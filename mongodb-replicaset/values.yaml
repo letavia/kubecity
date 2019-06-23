@@ -25,13 +25,13 @@ auth:
 installImage:
   repository: k8s.gcr.io/mongodb-install
   tag: 0.6
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 # Specs for the MongoDB image
 image:
   repository: mongo
   tag: 3.6
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 # Additional environment variables to be set in the container
 extraVars: {}
@@ -44,7 +44,7 @@ metrics:
   image:
     repository: ssalaues/mongodb-exporter
     tag: 0.6.1
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   port: 9216
   path: "/metrics"
   socketTimeout: 3s
@@ -77,9 +77,8 @@ affinity: {}
 
 tolerations: []
 
-extraLabels: {}
-  #app: orion
-  #tier: database     
+extraLabels: 
+  tier: context-broker 
    
 persistentVolume:
   enabled: true

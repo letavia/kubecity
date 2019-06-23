@@ -8,6 +8,9 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }}     
 spec:
   ports:
   - name: {{ template "name" . }}
@@ -15,21 +18,26 @@ spec:
   clusterIP: None
   selector:
     app: {{ template "name" . }}
+
 ---
 # Client service for connecting to any MySQL instance for reads.
 # For writes, you must instead connect to the master: mysql-0.mysql.
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "fullname" . }}-readonly
+  name: {{ template "fullname" . }}-write
   labels:
     app: {{ template "name" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }}     
 spec:
   ports:
   - name: {{ template "name" . }}
     port: 3306
   selector:
     app: {{ template "name" . }}
+    statefulset.kubernetes.io/pod-name: mysql-rs-0

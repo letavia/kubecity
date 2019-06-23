@@ -7,7 +7,7 @@ metadata:
      storageclass.kubernetes.io/is-default-class: "true"
 provisioner: kubernetes.io/glusterfs
 parameters:
-  resturl: "http://35.184.81.0:8080"
+  resturl: "http://35.239.108.108:8080"
   #clusterid: "3cc10f0a087efcf5005b989f61f6608c"
   #restuser: "dodol"
   #secretNamespace: "default"

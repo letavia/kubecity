@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: orion-cb
+  name: orion
   labels:
     app: context-broker
     tier: orion
@@ -17,12 +17,12 @@ spec:
 apiVersion: apps/v1 #for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: orion-cb
+  name: orion
   labels:
     app: context-broker
     tier: orion
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: context-broker
@@ -37,21 +37,16 @@ spec:
     spec:
       containers:
       - image: fiware/orion:2.0.0
-        name: orion-cb
+        name: orion
+        imagePullPolicy: Always
         env:
         - name: VERSION
           value: V1
         - name: MONGO_INITDB_ROOT_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: user
+          value: root
         - name: MONGO_INITDB_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: password
+          value: mongodb
         ports:
         - containerPort: 1026
           name: orion  
-        args: ["-dbhost","mongodb-mongodb-replicaset","-dbuser","$(MONGO_INITDB_ROOT_USERNAME)","-dbpwd","$(MONGO_INITDB_ROOT_PASSWORD)"]
+        args: ["-dbhost","mongodb-rs-kubecity","-dbuser","$(MONGO_INITDB_ROOT_USERNAME)","-dbpwd","$(MONGO_INITDB_ROOT_PASSWORD)"]

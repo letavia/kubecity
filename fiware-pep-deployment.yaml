@@ -62,7 +62,7 @@ spec:
          - name: PEP_PROXY_APP_SSL_ENABLED
            value: "false" #default false - Use true if the app server listens in https
          - name: PEP_PROXY_AUTH_ENABLED
-           value: "true" #default false
+           value: "true" #default false - checking authorization
          - name: PEP_PROXY_APP_ID
            value: dbc6ad7a-4153-4418-9aa5-f2c7881ab904 
          - name: PEP_PROXY_USERNAME

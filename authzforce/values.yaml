@@ -9,16 +9,19 @@ image:
   tag: release-8.0.1
   pullPolicy: IfNotPresent
 
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: authzforce
+fullnameOverride: authzforce-idm
 
 service:
-  type: LoadBalancer
+  type: ClusterIP
   port: 8080
   targetPort: 8080
   
 ports:
   containerPort: 8080 
+  
+extraLabels: 
+  tier: idm
 
 readinessProbe:
   initialDelaySeconds: 5

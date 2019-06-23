@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "orion.fullname" . }} #orion
+  name: {{ include "orion.fullname" . }} 
   labels:
-    app: {{ include "orion.name" . }} #orion
-    chart: {{ include "orion.chart" . }} #orion-0.2.0 
-    release: {{ .Release.Name }} #orion
-    heritage: {{ .Release.Service }} #Tiller
+    app: {{ include "orion.name" . }} 
+    chart: {{ include "orion.chart" . }} 
+    release: {{ .Release.Name }} 
+    heritage: {{ .Release.Service }} 
 {{- if .Values.extraLabels }}
 {{ toYaml .Values.extraLabels | indent 4 }}
 {{- end }}

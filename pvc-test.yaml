@@ -1,8 +1,8 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: test
-  #namespace: default
+  name: wirecloud-pvc
+  namespace: kubecity
   #annotations:
    #  volume.beta.kubernetes.io/storage-class: "test"
 spec:
@@ -13,5 +13,3 @@ spec:
   resources:
     requests:
       storage: 1Gi
-
-      

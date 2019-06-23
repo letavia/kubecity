@@ -7,26 +7,26 @@ metadata:
     chart: {{ include "keyrock.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    {{- if .Values.extraLabels }}  
-    {{ include "keyrock.extraLabels" . }}
-    {{- end }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }} 
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: {{ include "keyrock.name" . }}
       release: {{ .Release.Name }}
-      {{- if .Values.extraLabels }}
-      {{ include "keyrock.extraLabels" . }}
-      {{- end }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 6 }}
+{{- end }} 
   template:
     metadata:
       labels:
         app: {{ include "keyrock.name" . }}
         release: {{ .Release.Name }}
-        {{- if .Values.extraLabels }}
-        {{ include "keyrock.extraLabels" . }}
-        {{- end }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 8 }}
+{{- end }} 
     spec:
       containers:
         - name: {{ .Chart.Name }}
@@ -40,20 +40,20 @@ spec:
             value: {{ .Values.database.host }}
           - name: IDM_DB_PASS 
             value: {{ .Values.database.password }}
-          #- name: IDM_DB_USER
-          #  value: {{ .Values.database.user }}
+          - name: IDM_DB_USER
+            value: {{ .Values.database.user }}
           - name: IDM_DB_NAME
             value: {{ .Values.database.name }}
-          #- name: IDM_DB_PORT
-          #  value: {{ .Values.database.port }}
+          - name: IDM_DB_PORT
+            value: {{ quote .Values.database.port }}
           - name: IDM_HOST
             value: {{ .Values.portal.host }} 
-          #- name: IDM_PORT
-          #  value: {{ .Values.portal.port }}
-          #- name: IDM_HTTPS_ENABLED
-          #  value: {{ .Values.portal.httpsEnabled }}
-          #- name: IDM_HTTPS_PORT
-          #  value: {{ .Values.portal.httpsPort }}
+          - name: IDM_PORT
+            value: {{ quote .Values.portal.port }}
+          - name: IDM_HTTPS_ENABLED
+            value: {{ quote .Values.portal.httpsEnabled }}
+          - name: IDM_HTTPS_PORT
+            value: {{ quote .Values.portal.httpsPort }}
           - name: IDM_ADMIN_ID
             value: {{ .Values.portal.adminID }}
           - name: IDM_ADMIN_USER
@@ -74,14 +74,14 @@ spec:
             value: {{ .Values.sessionSecret }}
           - name: IDM_ENCRYPTION_KEY
             value: {{ .Values.encryptionKey }}
-          #- name: IDM_DIALECT
-          #  value: {{ .Values.dialect }}
-          #- name: IDM_EMAIL_HOST
-          #  value: {{ .Values.email.host }}
-          #- name: IDM_EMAIL_PORT
-          #  value: {{ .Values.email.port }}
-          #- name: IDM_EMAIL_ADDRESS
-          #  value: {{ .Values.email.address }}
+          - name: IDM_DIALECT
+            value: {{ .Values.dialect }}
+          - name: IDM_EMAIL_HOST
+            value: {{ .Values.email.host }}
+          - name: IDM_EMAIL_PORT
+            value: {{ quote .Values.email.port }}
+          - name: IDM_EMAIL_ADDRESS
+            value: {{ .Values.email.address }}
           #- name: IDM_EX_AUTH_ENABLED
           #  value: {{ .Values.external.enabled }}
           #- name: IDM_EX_AUTH_DB_USER
@@ -98,16 +98,17 @@ spec:
           #  value: {{ .Values.external.dbUserTable }}
           #- name: IDM_EX_AUTH_DIALECT
           #  value: {{ .Values.external.dialect }}               
+
           readinessProbe:
             exec:
               command:
                 - curl
                 - http://localhost:3000
-            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
-            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
           livenessProbe:
             exec:
               command:
@@ -118,6 +119,5 @@ spec:
             failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
             successThreshold: {{ .Values.livenessProbe.successThreshold }}
- 
 
 

@@ -9,8 +9,8 @@ image:
   tag: 2.0.0
   pullPolicy: IfNotPresent
 
-nameOverride: "orion"
-fullnameOverride: "orion-cb"
+nameOverride: orion
+fullnameOverride: orion-cb
 
 service:
   type: LoadBalancer
@@ -61,8 +61,8 @@ affinity: {}
 
 # Readiness probe
 readinessProbe:
-  initialDelaySeconds: 10
-  timeoutSeconds: 1
+  initialDelaySeconds: 20
+  timeoutSeconds: 3
   failureThreshold: 3
   periodSeconds: 30
   successThreshold: 2

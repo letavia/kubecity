@@ -7,9 +7,9 @@ metadata:
     chart: {{ include "keyrock.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    {{- if .Values.extraLabels }}
-    {{ include "keyrock.extraLabels" . }}
-    {{- end }}    
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }}    
 spec:
   type: {{ .Values.service.type }}
   ports: 
@@ -19,15 +19,9 @@ spec:
   - name: {{ .Values.service.ports.idmHttps.name }}
     port: {{ .Values.service.ports.idmHttps.port }}
     targetPort: {{ .Values.service.ports.idmHttps.targetPort }}
-  - name: {{ .Values.service.ports.authTokenExt.name }}
-    port: {{ .Values.service.ports.authTokenExt.port }}
-    targetPort: {{ .Values.service.ports.authTokenExt.targetPort }}
-  - name: {{ .Values.service.ports.authTokenInt.name }}
-    port: {{ .Values.service.ports.authTokenInt.port }}
-    targetPort: {{ .Values.service.ports.authTokenInt.targetPort }}
   selector:
     app: {{ include "keyrock.name" . }}
     release: {{ .Release.Name }}
-    {{- if .Values.extraLabels }}
-    {{ include "keyrock.extraLabels" . }} 
-    {{- end }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }} 

@@ -40,6 +40,8 @@ spec:
             value: {{ .Values.contextBroker.host }}
           - name: IOTA_CB_PORT
             value: {{ quote .Values.contextBroker.port }}
+          - name: IOTA_CB_NGSI_VERSION
+            value: {{ .Values.contextBroker.ngsiVersion }}
           - name: IOTA_NORTH_PORT
             value: {{ quote .Values.agent.northPort }}
           - name: IOTA_REGISTRY_TYPE
@@ -71,17 +73,71 @@ spec:
           - name: IOTA_AUTH_TYPE
             value: {{ .Values.auth.type }}
           - name: IOTA_AUTH_HEADER
-            value: {{ .Values.auth.header }}         
+            value: {{ .Values.auth.header }}       
           - name: IOTA_AUTH_HOST
             value: {{ .Values.auth.host }}
           - name: IOTA_AUTH_PORT
             value: {{ quote .Values.auth.port }} 
-          - name: IOTA_AUTH_USER
-            value: {{ .Values.auth.user }}         
-          - name: IOTA_AUTH_PASSWORD
-            value: {{ .Values.auth.password }}
+          - name: IOTA_AUTH_CLIENT_ID
+            value: {{ .Values.auth.clientId }}     
+          - name: IOTA_AUTH_CLIENT_SECRET
+            value: {{ .Values.auth.clientSecret }}
+          - name: IOTA_AUTH_IOTA_AUTH_TOKEN_PATH
+            value: {{ .Values.auth.tokenPath }}
           - name: IOTA_AUTH_PERMANENT_TOKEN
-            value: {{ .Values.auth.permanent_token }} 
-
-
+            value: {{ quote .Values.auth.permanentToken }}
+          - name: IOTA_AUTOCAST
+            value: {{ quote .Values.autocast }}
+          - name: IOTA_MQTT_HOST
+            value: {{ .Values.mqtt.host }}
+          - name: IOTA_MQTT_PORT
+            value: {{ quote .Values.mqtt.port }}
+          #- name: IOTA_MQTT_USERNAME
+          #  value: {{ .Values.mqtt.username }}
+          #- name: IOTA_MQTT_PASSWORD
+          #  value: {{ .Values.mqtt.password }}
+          - name: IOTA_MQTT_QOS
+            value: {{ quote .Values.mqtt.qos }}
+          - name: IOTA_MQTT_RETAIN
+            value: {{ quote .Values.mqtt.retain }} 
+          - name: IOTA_AMQP_HOST
+            value: {{ .Values.amqp.host }}
+          - name: IOTA_AMQP_PORT
+            value: {{ quote .Values.amqp.port }}          
+          - name: IOTA_AMQP_USERNAME
+            value: {{ .Values.amqp.username }}          
+          - name: IOTA_AMQP_PASSWORD
+            value: {{ .Values.amqp.password }}        
+          - name: IOTA_AMQP_EXCHANGE
+            value: {{ .Values.amqp.exchange }}   
+          - name: IOTA_AMQP_QUEUE
+            value: {{ .Values.amqp.queue }}
+          - name: IOTA_AMQP_DURABLE
+            value: {{ quote .Values.amqp.durable }}
+          - name: IOTA_AMQP_RETRIES
+            value: {{ quote .Values.amqp.retries }}
+          - name: IOTA_AMQP_RETRY_TIME
+            value: {{ quote .Values.amqp.retry }}     
+          #- name: IOTA_AMQP_VHOST
+          #  value: {{ .Values.amqp.vhost }}             
+          readinessProbe:
+            exec:
+              command:
+                - curl
+                - http://localhost:4041/iot/about
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - http://localhost:4041/iot/about
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
 
